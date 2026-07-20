@@ -470,4 +470,28 @@ describe('httpMutation', () => {
       }) satisfies HttpMutation<AddUserEntry, { id: number }>;
     });
   });
+
+  it('should support non-json responseType such as blob', () => {
+    const downloadFile = TestBed.runInInjectionContext(() =>
+      httpMutation<string, Blob>({
+        request: (fileId) => ({
+          url: `/api/files/${fileId}`,
+          method: 'GET',
+          responseType: 'blob',
+        }),
+      }),
+    );
+
+    downloadFile('report-1');
+
+    const req = httpTestingController.expectOne('/api/files/report-1');
+    expect(req.request.method).toBe('GET');
+    expect(req.request.responseType).toBe('blob');
+
+    const mockBlob = new Blob(['file-contents'], { type: 'text/plain' });
+    req.flush(mockBlob);
+
+    expect(downloadFile.status()).toBe('success');
+    expect(downloadFile.value()).toEqual(mockBlob);
+  });
 });

@@ -5,6 +5,7 @@ import {
   HttpHeaders,
   HttpParams,
   HttpProgressEvent,
+  HttpRequest,
   HttpResponse,
 } from '@angular/common/http';
 import { inject, Signal, signal } from '@angular/core';
@@ -21,6 +22,7 @@ export type HttpMutationRequest = {
   headers?: HttpHeaders | Record<string, string | string[]>;
   context?: HttpContext;
   reportProgress?: boolean;
+  responseType?: HttpRequest<unknown>['responseType'];
   params?:
     | HttpParams
     | Record<
@@ -139,10 +141,10 @@ export function httpMutation<Parameter, Result>(
         statusCode.set(undefined);
 
         return httpClient
-          .request<Result>(httpRequest.method, httpRequest.url, {
+          .request(httpRequest.method, httpRequest.url, {
             ...httpRequest,
             observe: 'events',
-            responseType: 'json',
+            responseType: httpRequest.responseType ?? 'json',
           })
           .pipe(
             tap((response) => {
