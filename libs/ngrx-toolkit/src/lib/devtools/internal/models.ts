@@ -2,7 +2,10 @@ import { StateSource } from '@ngrx/signals';
 import { ReduxDevtoolsConfig } from '../provide-devtools-config';
 import { DevtoolsInnerOptions } from './devtools-feature';
 
-export type Action = { type: string };
+declare const __actionBrand: unique symbol;
+export type Action = { type: string; [key: string]: unknown } & {
+  readonly [__actionBrand]: true;
+};
 export type Connection = {
   send: (action: Action, state: Record<string, unknown>) => void;
 };

@@ -28,6 +28,7 @@ const testEvents = eventGroup({
   source: 'Spec Store',
   events: {
     bump: type<void>(),
+    bookSelected: type<{ bookId: string }>(),
   },
 });
 
@@ -76,6 +77,29 @@ describe('withTrackedReducer', () => {
     expect(sendSpy).toHaveBeenLastCalledWith(
       { type: '[Spec Store] bump' },
       { 'store-a': { count: 1 }, 'store-b': { count: 1 } },
+    );
+  });
+
+  it('should send event payload to devtools when using tracked reducer', () => {
+    const { sendSpy, withBasicStore } = setup();
+
+    const Store = signalStore(
+      { providedIn: 'root' },
+      withBasicStore('store'),
+      withTrackedReducer(
+        on(testEvents.bookSelected, ({ payload }) => ({
+          count: Number(payload.bookId),
+        })),
+      ),
+    );
+
+    TestBed.inject(Store);
+
+    dispatchBookSelectedEvent('42');
+
+    expect(sendSpy).toHaveBeenLastCalledWith(
+      { type: '[Spec Store] bookSelected', payload: { bookId: '42' } },
+      { store: { count: 42 } },
     );
   });
 
@@ -258,6 +282,10 @@ describe('withTrackedReducer', () => {
 
 function dispatchBumpEvent() {
   TestBed.inject(Dispatcher).dispatch(testEvents.bump());
+}
+
+function dispatchBookSelectedEvent(bookId: string) {
+  TestBed.inject(Dispatcher).dispatch(testEvents.bookSelected({ bookId }));
 }
 
 function setup() {

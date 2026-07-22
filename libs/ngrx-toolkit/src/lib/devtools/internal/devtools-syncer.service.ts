@@ -10,11 +10,26 @@ import { StateSource } from '@ngrx/signals';
 import { REDUX_DEVTOOLS_CONFIG } from '../provide-devtools-config';
 import { currentActionNames } from './current-action-names';
 import { DevtoolsInnerOptions } from './devtools-feature';
-import { Connection, StoreRegistry, Tracker } from './models';
+import { Action, Connection, StoreRegistry, Tracker } from './models';
 
 const dummyConnection: Connection = {
   send: () => void true,
 };
+
+function toDevtoolsAction(actions: (string | Action)[]): Action {
+  if (!actions.length) {
+    return { type: 'Store Update' } as Action;
+  }
+
+  const objects = actions.filter((a): a is Action => typeof a === 'object');
+  const type = [
+    ...new Set(actions.map((a) => (typeof a === 'string' ? a : a.type))),
+  ].join(', ');
+
+  return objects.length
+    ? ({ ...objects[0], type } as Action)
+    : ({ type } as Action);
+}
 
 /**
  * A service provided by the root injector is
@@ -90,11 +105,11 @@ export class DevtoolsSyncer implements OnDestroy {
       ...mappedChangedStatePerName,
     };
 
-    const names = Array.from(currentActionNames);
-    const type = names.length ? names.join(', ') : 'Store Update';
+    const actions = Array.from(currentActionNames);
+    const action = toDevtoolsAction(actions);
     currentActionNames.clear();
 
-    this.#connection.send({ type }, this.#currentState);
+    this.#connection.send(action, this.#currentState);
   }
 
   getNextId() {

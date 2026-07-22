@@ -188,6 +188,7 @@ export const bookEvents = eventGroup({
   source: 'Book Store',
   events: {
     loadBooks: type<void>(),
+    bookSelected: type<{ bookId: string }>(),
   },
 });
 
@@ -201,6 +202,10 @@ const Store = signalStore(
     // `[Book Store] loadBooks` will show up in the devtools
     on(bookEvents.loadBooks, () => ({
       books: mockBooks,
+    })),
+    // DevTools action will include payload: { bookId: string }
+    on(bookEvents.bookSelected, ({ payload }) => ({
+      selectedBookId: payload.bookId,
     })),
   ),
   withHooks({

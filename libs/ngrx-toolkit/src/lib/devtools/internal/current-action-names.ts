@@ -1,1 +1,3 @@
-export const currentActionNames = new Set<string>();
+import { Action } from './models';
+
+export const currentActionNames = new Set<string | Action>();

@@ -34,7 +34,7 @@ function withMyEntity<Entity>(loadMethod: (id: number) => Promise<Entity>) {
 const UserStore = signalStore(
   { providedIn: 'root' },
   withMethods(() => ({
-    findById(id: number) {
+    findById(_id: number) {
       return of({ id: 1, name: 'Konrad' });
     },
   })),

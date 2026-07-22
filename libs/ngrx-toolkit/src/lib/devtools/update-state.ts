@@ -4,6 +4,7 @@ import {
   WritableStateSource,
 } from '@ngrx/signals';
 import { currentActionNames } from './internal/current-action-names';
+import { Action } from './internal/models';
 
 type PatchFn = typeof originalPatchState extends (
   arg1: infer First,
@@ -20,6 +21,14 @@ export const patchState: PatchFn = (state, action, ...rest) => {
 };
 
 /**
+ * Casts an object with a `type` property to an {@link Action}.
+ * Use this when you need to pass a structured action object to {@link updateState}.
+ */
+export function asAction<T extends { type: string }>(value: T): Action {
+  return value as unknown as Action;
+}
+
+/**
  * Wrapper of `patchState` for DevTools integration. Next to updating the state,
  * it also sends the action to the DevTools.
  * @param stateSource state of Signal Store
@@ -28,7 +37,7 @@ export const patchState: PatchFn = (state, action, ...rest) => {
  */
 export function updateState<State extends object>(
   stateSource: WritableStateSource<State>,
-  action: string,
+  action: string | Action,
   ...updaters: Array<
     Partial<NoInfer<State>> | PartialStateUpdater<NoInfer<State>>
   >
