@@ -1,4 +1,13 @@
-import { ResourceRef, Signal, isSignal, linkedSignal } from '@angular/core';
+import {
+  Resource,
+  ResourceRef,
+  ResourceSnapshot,
+  ResourceStatus,
+  Signal,
+  computed,
+  isSignal,
+  linkedSignal,
+} from '@angular/core';
 import {
   SignalStoreFeature,
   SignalStoreFeatureResult,
@@ -6,6 +15,7 @@ import {
   signalStoreFeature,
   withComputed,
   withLinkedState,
+  withProps,
 } from '@ngrx/signals';
 import {
   EntityId,
@@ -17,7 +27,6 @@ import {
 import {
   NamedResourceResult,
   ResourceResult,
-  isResourceRef,
   withResource,
 } from './with-resource';
 
@@ -94,6 +103,15 @@ export function withEntityResources<
   resourceFactory: (
     store: Input['props'] & Input['methods'] & StateSignals<Input['state']>,
   ) => ResourceRef<TypedEntityResourceValue<Entity>>,
+): SignalStoreFeature<Input, EntityResourceRefResult<Entity>>;
+
+export function withEntityResources<
+  Input extends SignalStoreFeatureResult,
+  Entity extends { id: EntityId },
+>(
+  resourceFactory: (
+    store: Input['props'] & Input['methods'] & StateSignals<Input['state']>,
+  ) => Resource<TypedEntityResourceValue<Entity>>,
 ): SignalStoreFeature<Input, EntityResourceResult<Entity>>;
 
 export function withEntityResources<
@@ -111,7 +129,7 @@ export function withEntityResources<
 >(
   entityResourceFactory: (
     store: Input['props'] & Input['methods'] & StateSignals<Input['state']>,
-  ) => ResourceRef<ResourceValue> | EntityDictionary,
+  ) => Resource<ResourceValue> | EntityDictionary,
 ): SignalStoreFeature<Input> {
   return (store) => {
     const resourceOrDict = entityResourceFactory({
@@ -120,7 +138,9 @@ export function withEntityResources<
       ...store.methods,
     });
 
-    if (isResourceRef(resourceOrDict)) {
+    if (isEntityResourceRef(resourceOrDict)) {
+      return createUnnamedEntityResourceRef(resourceOrDict)(store);
+    } else if (isEntityResource(resourceOrDict)) {
       return createUnnamedEntityResource(resourceOrDict)(store);
     }
     return createNamedEntityResources(resourceOrDict)(store);
@@ -133,17 +153,65 @@ export function withEntityResources<
  * because {@link withResource} creates a Proxy around the resource value
  * to avoid the error throwing behavior of the Resource API.
  */
-function createUnnamedEntityResource<E extends Entity>(
+function createUnnamedEntityResourceRef<E extends Entity>(
   resource: ResourceRef<TypedEntityResourceValue<E>>,
 ) {
   return signalStoreFeature(
     withResource(() => resource),
-    withLinkedState(({ value }) => {
-      const { ids, entityMap } = createEntityDerivations(value);
+    withLinkedState((store) => {
+      // `value` exists in either the `props` or `state`, but `store` here only
+      // infers the `state` case, so we have to do this bleh casting
+      const propsOrStateStore = store as {
+        value: Signal<TypedEntityResourceValue<E>>;
+        status: Signal<ResourceStatus>;
+        error: Signal<Error | undefined>;
+        isLoading: Signal<boolean>;
+        snapshot: Signal<ResourceSnapshot<TypedEntityResourceValue<E>>>;
+      };
+      const resourceValue = propsOrStateStore[
+        `value`
+      ] as Signal<EntityResourceValue>;
+      if (!isSignal(resourceValue)) {
+        throw new Error(`Resource's value ${name}Value does not exist`);
+      }
+
+      const { ids, entityMap } = createEntityDerivations(resourceValue);
 
       return {
         entityMap,
         ids,
+      };
+    }),
+    withComputed(({ ids, entityMap }) => ({
+      entities: createComputedEntities(ids, entityMap),
+    })),
+  );
+}
+
+function createUnnamedEntityResource<E extends Entity>(
+  resource: Resource<TypedEntityResourceValue<E>>,
+) {
+  return signalStoreFeature(
+    withResource(() => resource),
+    withProps((store) => {
+      const propsStore = store as {
+        value: Signal<TypedEntityResourceValue<E>>;
+        status: Signal<ResourceStatus>;
+        error: Signal<Error | undefined>;
+        isLoading: Signal<boolean>;
+        snapshot: Signal<ResourceSnapshot<TypedEntityResourceValue<E>>>;
+      };
+
+      const resourceValue = propsStore.value as Signal<EntityResourceValue>;
+      if (!isSignal(resourceValue)) {
+        throw new Error(`Resource's value signal does not exist`);
+      }
+
+      const { ids, entityMap } = createReadonlyEntityDerivations(resourceValue);
+
+      return {
+        ids,
+        entityMap,
       };
     }),
     withComputed(({ ids, entityMap }) => ({
@@ -160,23 +228,46 @@ function createNamedEntityResources<Dictionary extends EntityDictionary>(
 ) {
   const keys = Object.keys(dictionary);
 
-  const stateFactories = keys.map((name) => {
-    return (store: Record<string, unknown>) => {
-      const resourceValue = store[
-        `${name}Value`
-      ] as Signal<EntityResourceValue>;
-      if (!isSignal(resourceValue)) {
-        throw new Error(`Resource's value ${name}Value does not exist`);
-      }
+  const stateFactories = keys
+    .filter((name) => isEntityResourceRef(dictionary[name]))
+    .map((name) => {
+      return (store: Record<string, unknown>) => {
+        const resourceValue = store[
+          `${name}Value`
+        ] as Signal<EntityResourceValue>;
+        if (!isSignal(resourceValue)) {
+          throw new Error(`Resource's value ${name}Value does not exist`);
+        }
 
-      const { ids, entityMap } = createEntityDerivations(resourceValue);
+        const { ids, entityMap } = createEntityDerivations(resourceValue);
 
-      return {
-        [`${name}EntityMap`]: entityMap,
-        [`${name}Ids`]: ids,
+        return {
+          [`${name}EntityMap`]: entityMap,
+          [`${name}Ids`]: ids,
+        };
       };
-    };
-  });
+    });
+
+  const propsFactories = keys
+    .filter((name) => !isEntityResourceRef(dictionary[name]))
+    .map((name) => {
+      return (store: Record<string, unknown>) => {
+        const resourceValue = store[
+          `${name}Value`
+        ] as Signal<EntityResourceValue>;
+        if (!isSignal(resourceValue)) {
+          throw new Error(`Resource's value ${name}Value does not exist`);
+        }
+
+        const { ids, entityMap } =
+          createReadonlyEntityDerivations(resourceValue);
+
+        return {
+          [`${name}EntityMap`]: entityMap,
+          [`${name}Ids`]: ids,
+        };
+      };
+    });
 
   const computedFactories = keys.map((name) => {
     return (store: Record<string, unknown>) => {
@@ -204,13 +295,28 @@ function createNamedEntityResources<Dictionary extends EntityDictionary>(
     withResource(() => dictionary),
     withLinkedState((store) =>
       stateFactories.reduce(
-        (acc, factory) => ({ ...acc, ...factory(store) }),
+        (acc, factory) => ({
+          ...acc,
+          ...factory(store),
+        }),
+        {},
+      ),
+    ),
+    withProps((store) =>
+      propsFactories.reduce(
+        (acc, factory) => ({
+          ...acc,
+          ...factory(store),
+        }),
         {},
       ),
     ),
     withComputed((store) =>
       computedFactories.reduce(
-        (acc, factory) => ({ ...acc, ...factory(store) }),
+        (acc, factory) => ({
+          ...acc,
+          ...factory(store),
+        }),
         {},
       ),
     ),
@@ -238,9 +344,34 @@ function createNamedEntityResources<Dictionary extends EntityDictionary>(
  * - For named resources we return `NamedResourceResult<T>` intersected with
  *   `NamedEntityState<E, Name>` and `NamedEntityProps<E, Name>` for each entry.
  */
-export type EntityResourceResult<Entity> = {
+declare const NON_PATCHABLE_ENTITY_RESOURCE_STATE: unique symbol;
+
+type NonPatchableEntityResourceStateMarker = {
+  [NON_PATCHABLE_ENTITY_RESOURCE_STATE]?: never;
+};
+
+type ReadonlyEntityProps<E extends Entity> = {
+  ids: Signal<EntityId[]>;
+  entityMap: Signal<Record<EntityId, E>>;
+};
+
+type NamedReadonlyEntityProps<E extends Entity, Name extends string> = {
+  [Prop in `${Name}Ids`]: Signal<EntityId[]>;
+} & {
+  [Prop in `${Name}EntityMap`]: Signal<Record<EntityId, E>>;
+};
+
+export type EntityResourceRefResult<Entity> = {
   state: ResourceResult<Entity>['state'] & EntityState<Entity>;
   props: ResourceResult<Entity>['props'] & EntityProps<Entity>;
+  methods: ResourceResult<Entity>['methods'];
+};
+
+export type EntityResourceResult<Entity extends { id: EntityId }> = {
+  state: NonPatchableEntityResourceStateMarker;
+  props: ResourceResult<Entity>['props'] &
+    EntityProps<Entity> &
+    ReadonlyEntityProps<Entity>;
   methods: ResourceResult<Entity>['methods'];
 };
 
@@ -262,16 +393,37 @@ type EntityResourceValue = Entity[] | (Entity[] | undefined);
 
 type TypedEntityResourceValue<E extends Entity> = E[] | (E[] | undefined);
 
-export type EntityDictionary = Record<string, ResourceRef<EntityResourceValue>>;
+export type EntityDictionary = Record<
+  string,
+  ResourceRef<EntityResourceValue> | Resource<EntityResourceValue>
+>;
 
 type MergeNamedEntityStates<T extends EntityDictionary> = MergeUnion<
   {
     [Prop in keyof T]: Prop extends string
-      ? InferEntityFromSignal<T[Prop]['value']> extends infer E
-        ? E extends never
-          ? never
-          : NamedEntityState<E, Prop>
+      ? T[Prop] extends ResourceRef<unknown>
+        ? InferEntityFromSignal<T[Prop]['value']> extends infer E
+          ? E extends never
+            ? never
+            : NamedEntityState<E, Prop>
+          : never
         : never
+      : never;
+  }[keyof T]
+>;
+
+type MergeNamedReadonlyEntityProps<T extends EntityDictionary> = MergeUnion<
+  {
+    [Prop in keyof T]: Prop extends string
+      ? T[Prop] extends ResourceRef<unknown>
+        ? never
+        : InferEntityFromSignal<T[Prop]['value']> extends infer E
+          ? E extends Entity
+            ? NamedReadonlyEntityProps<E, Prop>
+            : E extends never
+              ? never
+              : never
+          : never
       : never;
   }[keyof T]
 >;
@@ -289,8 +441,12 @@ type MergeNamedEntityProps<T extends EntityDictionary> = MergeUnion<
 >;
 
 export type NamedEntityResourceResult<T extends EntityDictionary> = {
-  state: NamedResourceResult<T, false>['state'] & MergeNamedEntityStates<T>;
-  props: NamedResourceResult<T, false>['props'] & MergeNamedEntityProps<T>;
+  state: NamedResourceResult<T, false>['state'] &
+    MergeNamedEntityStates<T> &
+    NonPatchableEntityResourceStateMarker;
+  props: NamedResourceResult<T, false>['props'] &
+    MergeNamedEntityProps<T> &
+    MergeNamedReadonlyEntityProps<T>;
   methods: NamedResourceResult<T, false>['methods'];
 };
 
@@ -341,6 +497,22 @@ function createEntityDerivations<E extends Entity>(
   return { ids, entityMap };
 }
 
+function createReadonlyEntityDerivations<E extends Entity>(
+  source: Signal<TypedEntityResourceValue<E>>,
+) {
+  const ids = computed(() => (source() ?? []).map((e) => e.id));
+
+  const entityMap = computed(() => {
+    const map = {} as Record<EntityId, E>;
+    for (const item of source() ?? []) {
+      map[item.id] = item as E;
+    }
+    return map;
+  });
+
+  return { ids, entityMap };
+}
+
 function createComputedEntities<E extends Entity>(
   ids: Signal<EntityId[]>,
   entityMap: Signal<Record<EntityId, E>>,
@@ -348,4 +520,32 @@ function createComputedEntities<E extends Entity>(
   return () => {
     return ids().map((id) => entityMap()[id]);
   };
+}
+
+export function isEntityResource(
+  value: unknown,
+): value is Resource<EntityResourceValue> {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    'value' in value &&
+    isSignal(value.value) &&
+    'status' in value &&
+    'error' in value &&
+    'isLoading' in value &&
+    'snapshot' in value &&
+    'hasValue' in value
+  );
+}
+
+export function isEntityResourceRef(
+  value: unknown,
+): value is ResourceRef<EntityResourceValue> {
+  return (
+    isEntityResource(value) &&
+    'reload' in value &&
+    'set' in value &&
+    'update' in value &&
+    'asReadonly' in value
+  );
 }
