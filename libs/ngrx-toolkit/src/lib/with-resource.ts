@@ -1,9 +1,11 @@
 //** Types for `withResource` */
 
+import { HttpResourceRef } from '@angular/common/http';
 import {
   isSignal,
   Resource,
   ResourceRef,
+  ResourceSnapshot,
   ResourceStatus,
   Signal,
   untracked,
@@ -25,6 +27,19 @@ export type ResourceResult<T> = {
     status: Signal<ResourceStatus>;
     error: Signal<Error | undefined>;
     isLoading: Signal<boolean>;
+    snapshot: Signal<ResourceSnapshot<T>>;
+  };
+  methods: {
+    hasValue(): this is Resource<Exclude<T, undefined>>;
+  };
+};
+export type ResourceRefResult<T> = {
+  state: { value: T };
+  props: {
+    status: Signal<ResourceStatus>;
+    error: Signal<Error | undefined>;
+    isLoading: Signal<boolean>;
+    snapshot: Signal<ResourceSnapshot<T>>;
   };
   methods: {
     hasValue(): this is Resource<Exclude<T, undefined>>;
@@ -32,33 +47,136 @@ export type ResourceResult<T> = {
   };
 };
 
-export type ResourceDictionary = Record<string, ResourceRef<unknown>>;
+type ReloadableResource<T> = ResourceRef<T> | HttpResourceRef<T>;
+
+type ResourceCoreKeys =
+  | 'value'
+  | 'status'
+  | 'error'
+  | 'isLoading'
+  | 'snapshot'
+  | 'hasValue';
+
+type AdditionalSignalProps<T extends Resource<unknown>> = {
+  [Prop in keyof T as Prop extends ResourceCoreKeys
+    ? never
+    : T[Prop] extends Signal<unknown>
+      ? Prop
+      : never]: T[Prop];
+};
+
+type InferResourceValue<T extends Resource<unknown>> =
+  T['value'] extends Signal<infer S> ? S : never;
+
+type ConditionalReloadMethod<T extends Resource<unknown>> =
+  T extends ReloadableResource<unknown>
+    ? { _reload(): boolean }
+    : Record<never, never>;
+
+declare const NON_PATCHABLE_RESOURCE_STATE: unique symbol;
+
+type NonPatchableResourceStateMarker = {
+  [NON_PATCHABLE_RESOURCE_STATE]?: never;
+};
+
+type ResourceValueType<
+  T extends Resource<unknown>,
+  HasUndefinedErrorHandling extends boolean,
+> = HasUndefinedErrorHandling extends true
+  ? InferResourceValue<T> | undefined
+  : InferResourceValue<T>;
+
+type UnnamedResourceResult<
+  T extends Resource<unknown>,
+  HasUndefinedErrorHandling extends boolean,
+> = {
+  state: T extends ReloadableResource<unknown>
+    ? {
+        value: ResourceValueType<T, HasUndefinedErrorHandling>;
+      }
+    : NonPatchableResourceStateMarker;
+  props: (T extends ReloadableResource<unknown>
+    ? Record<never, never>
+    : {
+        value: Signal<ResourceValueType<T, HasUndefinedErrorHandling>>;
+      }) & {
+    status: Signal<ResourceStatus>;
+    error: Signal<Error | undefined>;
+    isLoading: Signal<boolean>;
+    snapshot: Signal<ResourceSnapshot<InferResourceValue<T>>>;
+  } & AdditionalSignalProps<T>;
+  methods: {
+    hasValue(): this is Resource<Exclude<InferResourceValue<T>, undefined>>;
+  } & ConditionalReloadMethod<T>;
+};
+
+export type ResourceDictionary = Record<string, Resource<unknown>>;
+
+// Without this, only one resource would be able to have its additional signal props extracted
+// When there are two or more named resources,
+//     neither additional property can be indexed for certain,
+//     because it would be a union of the two's additional properties,
+//     and TS cannot pick the correct one when indexing into it.
+//     So there would be no resolution of a particular resource's additional property.
+// This type util makes this type mapping an intersection, so all additional properties
+//     of all resources are preserved, but also can be indexed for a particular resource.
+// https://stackoverflow.com/a/50375286 explanation, with relevant TS doc links
+type UnionToIntersection<T> = (
+  T extends unknown ? (arg: T) => void : never
+) extends (arg: infer R) => void
+  ? R
+  : Record<never, never>;
+
+type NamedAdditionalSignalProps<T extends ResourceDictionary> =
+  UnionToIntersection<
+    {
+      [ResourceName in keyof T & string]: {
+        [Prop in keyof AdditionalSignalProps<T[ResourceName]> &
+          string as `${ResourceName}${Capitalize<Prop>}`]: AdditionalSignalProps<
+          T[ResourceName]
+        >[Prop];
+      };
+    }[keyof T & string]
+  >;
 
 export type NamedResourceResult<
   T extends ResourceDictionary,
   HasUndefinedErrorHandling extends boolean,
 > = {
   state: {
-    [Prop in keyof T as `${Prop &
-      string}Value`]: T[Prop]['value'] extends Signal<infer S>
-      ? HasUndefinedErrorHandling extends true
-        ? S | undefined
-        : S
+    [Prop in keyof T as T[Prop] extends ReloadableResource<unknown>
+      ? `${Prop & string}Value`
+      : never]: T[Prop] extends Resource<unknown>
+      ? ResourceValueType<T[Prop], HasUndefinedErrorHandling>
       : never;
-  };
+  } & NonPatchableResourceStateMarker;
   props: {
+    [Prop in keyof T as T[Prop] extends ReloadableResource<unknown>
+      ? never
+      : `${Prop & string}Value`]: Signal<
+      T[Prop] extends Resource<unknown>
+        ? ResourceValueType<T[Prop], HasUndefinedErrorHandling>
+        : never
+    >;
+  } & {
     [Prop in keyof T as `${Prop & string}Status`]: Signal<ResourceStatus>;
   } & {
     [Prop in keyof T as `${Prop & string}Error`]: Signal<Error | undefined>;
   } & {
     [Prop in keyof T as `${Prop & string}IsLoading`]: Signal<boolean>;
-  };
+  } & {
+    [Prop in keyof T as `${Prop & string}Snapshot`]: Signal<
+      ResourceSnapshot<T[Prop]['value'] extends Signal<infer S> ? S : never>
+    >;
+  } & NamedAdditionalSignalProps<T>;
   methods: {
     [Prop in keyof T as `${Prop & string}HasValue`]: () => this is Resource<
-      Exclude<T[Prop]['value'], undefined>
+      Exclude<InferResourceValue<T[Prop]>, undefined>
     >;
   } & {
-    [Prop in keyof T as `_${Prop & string}Reload`]: () => boolean;
+    [Prop in keyof T as T[Prop] extends ReloadableResource<unknown>
+      ? `_${Prop & string}Reload`
+      : never]: () => boolean;
   };
 };
 
@@ -81,10 +199,13 @@ const defaultOptions: Required<ResourceOptions> = {
  * Integrates a `Resource` into the SignalStore and makes the store instance
  * implement the `Resource` interface.
  *
- * The resource's value is stored under the `value` key in the state
- * and is exposed as a `DeepSignal`.
+ * Reloadable resources (`ResourceRef`/`HttpResourceRef`) expose their
+ * value under `value` in the store state and can be updated via `patchState`.
  *
- * It can also be updated via `patchState`.
+ * Plain `Resource` values are exposed as signals on the store instance,
+ * but are not part of state and therefore cannot be changed via `patchState`.
+ * Additional signal members on the resource (for example `foo`) are also
+ * exposed on the store as props.
  *
  * @usageNotes
  *
@@ -108,32 +229,32 @@ const defaultOptions: Required<ResourceOptions> = {
  */
 export function withResource<
   Input extends SignalStoreFeatureResult,
-  ResourceValue,
+  ResourceType extends Resource<unknown>,
 >(
   resourceFactory: (
     store: Input['props'] & Input['methods'] & StateSignals<Input['state']>,
-  ) => ResourceRef<ResourceValue>,
-): SignalStoreFeature<Input, ResourceResult<ResourceValue | undefined>>;
+  ) => ResourceType,
+): SignalStoreFeature<Input, UnnamedResourceResult<ResourceType, true>>;
 
 export function withResource<
   Input extends SignalStoreFeatureResult,
-  ResourceValue,
+  ResourceType extends Resource<unknown>,
 >(
   resourceFactory: (
     store: Input['props'] & Input['methods'] & StateSignals<Input['state']>,
-  ) => ResourceRef<ResourceValue>,
+  ) => ResourceType,
   resourceOptions: { errorHandling: 'undefined value' },
-): SignalStoreFeature<Input, ResourceResult<ResourceValue | undefined>>;
+): SignalStoreFeature<Input, UnnamedResourceResult<ResourceType, true>>;
 
 export function withResource<
   Input extends SignalStoreFeatureResult,
-  ResourceValue,
+  ResourceType extends Resource<unknown>,
 >(
   resourceFactory: (
     store: Input['props'] & Input['methods'] & StateSignals<Input['state']>,
-  ) => ResourceRef<ResourceValue>,
+  ) => ResourceType,
   resourceOptions?: ResourceOptions,
-): SignalStoreFeature<Input, ResourceResult<ResourceValue>>;
+): SignalStoreFeature<Input, UnnamedResourceResult<ResourceType, false>>;
 
 /**
  * @experimental
@@ -143,9 +264,13 @@ export function withResource<
  * registered by name, which is used as a prefix when spreading the members
  * of `Resource` onto the store.
  *
- * Each resource’s value is part of the state, stored under the `value` key
- * with the resource name as prefix. Values are exposed as `DeepSignal`s and
- * can be updated via `patchState`.
+ * Reloadable resources (`ResourceRef`/`HttpResourceRef`) place their values
+ * in state using `<name>Value` keys and support updates via `patchState`.
+ *
+ * Plain `Resource` values are exposed as read-only signals with `<name>Value`
+ * but are not stored in state.
+ * Additional signal members are exposed as read-only props using
+ * `<name><CapitalizedMember>`.
  *
  * @usageNotes
  *
@@ -166,7 +291,7 @@ export function withResource<
  * ```
  *
  * @param resourceFactory A factory function that receives the store's props,
- * methods, and state signals. It must return a `Record<string, ResourceRef>`.
+ * methods, and state signals. It must return a `Record<string, Resource>`.
  * @param resourceOptions Allows to configure the error handling behavior.
  */
 export function withResource<
@@ -204,7 +329,7 @@ export function withResource<
 >(
   resourceFactory: (
     store: Input['props'] & Input['methods'] & StateSignals<Input['state']>,
-  ) => ResourceRef<ResourceValue> | ResourceDictionary,
+  ) => Resource<ResourceValue> | ResourceDictionary,
   resourceOptions?: ResourceOptions,
 ): SignalStoreFeature<Input> {
   const options: Required<ResourceOptions> = {
@@ -218,7 +343,10 @@ export function withResource<
       ...store.methods,
     });
 
-    if (isResourceRef(resourceOrDictionary)) {
+    if (
+      isResourceRef(resourceOrDictionary) ||
+      isResource(resourceOrDictionary)
+    ) {
       return createUnnamedResource(
         resourceOrDictionary,
         options.errorHandling,
@@ -233,26 +361,44 @@ export function withResource<
 }
 
 function createUnnamedResource<ResourceValue>(
-  resource: ResourceRef<ResourceValue>,
+  resource: Resource<ResourceValue>,
   errorHandling: ErrorHandling,
 ) {
   function hasValue(): this is Resource<Exclude<ResourceValue, undefined>> {
-    return resource.hasValue();
+    if (isResourceRef(resource)) {
+      return resource.hasValue();
+    } else {
+      return resource.hasValue();
+    }
+  }
+
+  const metadataProps = {
+    status: resource.status,
+    error: resource.error,
+    isLoading: resource.isLoading,
+    snapshot: resource.snapshot,
+    ...extractAdditionalSignalProps(resource),
+  };
+
+  if (isResourceRef(resource)) {
+    return signalStoreFeature(
+      withLinkedState(() => ({
+        value: valueSignalForErrorHandling(resource, errorHandling),
+      })),
+      withProps(() => metadataProps),
+      withMethods(() => ({
+        hasValue,
+        _reload: () => resource.reload(),
+      })),
+    );
   }
 
   return signalStoreFeature(
-    withLinkedState(() => ({
-      value: valueSignalForErrorHandling(resource, errorHandling),
-    })),
     withProps(() => ({
-      status: resource.status,
-      error: resource.error,
-      isLoading: resource.isLoading,
+      value: valueSignalForErrorHandling(resource, errorHandling),
+      ...metadataProps,
     })),
-    withMethods(() => ({
-      hasValue,
-      _reload: () => resource.reload(),
-    })),
+    withMethods(() => ({ hasValue })),
   );
 }
 
@@ -262,37 +408,42 @@ function createNamedResource<Dictionary extends ResourceDictionary>(
 ) {
   const keys = Object.keys(dictionary);
 
-  const state: Record<string, WritableSignal<unknown>> = keys.reduce(
-    (state, resourceName) => ({
-      ...state,
-      [`${resourceName}Value`]: valueSignalForErrorHandling(
-        dictionary[resourceName],
+  const state: Record<string, WritableSignal<unknown>> = {};
+  const props: Record<string, Signal<unknown>> = {};
+  const methods: Record<string, () => boolean> = {};
+
+  for (const resourceName of keys) {
+    const res = dictionary[resourceName];
+
+    props[`${resourceName}Status`] = res.status;
+    props[`${resourceName}Error`] = res.error;
+    props[`${resourceName}IsLoading`] = res.isLoading;
+    props[`${resourceName}Snapshot`] = res.snapshot;
+    assignPrefixedProps(props, resourceName, extractAdditionalSignalProps(res));
+    methods[`${resourceName}HasValue`] = isResourceRef(res)
+      ? () => res.hasValue()
+      : () => res.hasValue();
+
+    if (isResourceRef(res)) {
+      state[`${resourceName}Value`] = valueSignalForErrorHandling(
+        res,
         errorHandling,
-      ),
-    }),
-    {},
-  );
+      ) as WritableSignal<unknown>;
+      methods[`_${resourceName}Reload`] = () => res.reload();
+    } else {
+      props[`${resourceName}Value`] = valueSignalForErrorHandling(
+        res,
+        errorHandling,
+      );
+    }
+  }
 
-  const props: Record<string, Signal<unknown>> = keys.reduce(
-    (props, resourceName) => ({
-      ...props,
-      [`${resourceName}Status`]: dictionary[resourceName].status,
-      [`${resourceName}Error`]: dictionary[resourceName].error,
-      [`${resourceName}IsLoading`]: dictionary[resourceName].isLoading,
-    }),
-    {},
-  );
-
-  const methods: Record<string, () => boolean> = keys.reduce(
-    (methods, resourceName) => {
-      return {
-        ...methods,
-        [`${resourceName}HasValue`]: () => dictionary[resourceName].hasValue(),
-        [`_${resourceName}Reload`]: () => dictionary[resourceName].reload(),
-      };
-    },
-    {},
-  );
+  if (Object.keys(state).length === 0) {
+    return signalStoreFeature(
+      withProps(() => props),
+      withMethods(() => methods),
+    );
+  }
 
   return signalStoreFeature(
     withLinkedState(() => state),
@@ -301,7 +452,7 @@ function createNamedResource<Dictionary extends ResourceDictionary>(
   );
 }
 
-export function isResourceRef(value: unknown): value is ResourceRef<unknown> {
+export function isResource(value: unknown): value is Resource<unknown> {
   return (
     value !== null &&
     typeof value === 'object' &&
@@ -310,9 +461,67 @@ export function isResourceRef(value: unknown): value is ResourceRef<unknown> {
     'status' in value &&
     'error' in value &&
     'isLoading' in value &&
-    'hasValue' in value &&
-    'reload' in value
+    'snapshot' in value &&
+    'hasValue' in value
   );
+}
+
+export function isResourceRef(value: unknown): value is ResourceRef<unknown> {
+  return (
+    isResource(value) &&
+    'reload' in value &&
+    'set' in value &&
+    'update' in value &&
+    'asReadonly' in value
+  );
+}
+
+function extractAdditionalSignalProps(
+  resource: Resource<unknown>,
+): Record<string, Signal<unknown>> {
+  const additionalSignals: Record<string, Signal<unknown>> = {};
+
+  for (const key of Object.keys(resource)) {
+    if (isResourceCoreKey(key)) {
+      continue;
+    }
+
+    const candidate = (resource as unknown as Record<string, unknown>)[key];
+    if (isSignal(candidate)) {
+      additionalSignals[key] = candidate;
+    }
+  }
+
+  return additionalSignals;
+}
+
+function isResourceCoreKey(key: string): key is ResourceCoreKeys {
+  return (
+    key === 'value' ||
+    key === 'status' ||
+    key === 'error' ||
+    key === 'isLoading' ||
+    key === 'snapshot' ||
+    key === 'hasValue'
+  );
+}
+
+function assignPrefixedProps(
+  target: Record<string, Signal<unknown>>,
+  resourceName: string,
+  source: Record<string, Signal<unknown>>,
+): void {
+  for (const key of Object.keys(source)) {
+    target[`${resourceName}${capitalizeKey(key)}`] = source[key];
+  }
+}
+
+function capitalizeKey(value: string): string {
+  if (value.length === 0) {
+    return value;
+  }
+
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 //** Types for `mapToResource` */
@@ -327,6 +536,8 @@ type NamedResource<Name extends string, T> = {
   [Prop in `${Name}IsLoading`]: Signal<boolean>;
 } & {
   [Prop in `${Name}HasValue`]: () => boolean;
+} & {
+  [Prop in `${Name}Snapshot`]: Signal<ResourceSnapshot<T>>;
 };
 
 type IsValidResourceName<
@@ -375,7 +586,7 @@ type MappedResource<
  *
  * @param store The store instance to map the resource to.
  * @param name The name of the resource to map.
- * @returns `ResourceRef<T>`
+ * @returns `Resource<T>`
  */
 export function mapToResource<
   Name extends ResourceNames<Store>,
@@ -394,6 +605,7 @@ export function mapToResource<
     status: store[`${resourceName}Status`],
     error: store[`${resourceName}Error`],
     isLoading: store[`${resourceName}IsLoading`],
+    snapshot: store[`${resourceName}Snapshot`],
     hasValue,
   } as MappedResource<Store, Name>;
 }
@@ -464,19 +676,19 @@ export function mapToResource<
  * a breaking change.
  */
 function valueSignalForErrorHandling<T>(
-  res: ResourceRef<T>,
+  res: Resource<T>,
   errorHandling: 'undefined value',
-): WritableSignal<T | undefined>;
+): Signal<T | undefined>;
 
 function valueSignalForErrorHandling<T>(
-  res: ResourceRef<T>,
+  res: Resource<T>,
   errorHandling: ErrorHandling,
-): WritableSignal<T>;
+): Signal<T>;
 
 function valueSignalForErrorHandling<T>(
-  res: ResourceRef<T>,
+  res: Resource<T>,
   errorHandling: ErrorHandling,
-): WritableSignal<T | undefined> {
+): Signal<T | undefined> {
   const originalSignal = res.value;
 
   switch (errorHandling) {
