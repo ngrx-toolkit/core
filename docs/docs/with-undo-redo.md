@@ -28,7 +28,7 @@ const SyncStore = signalStore(
 import { clearUndoRedo } from '@angular-architects/ngrx-toolkit';
 
 @Component(...)
-public class UndoRedoComponent {
+export class UndoRedoComponent {
   private syncStore = inject(SyncStore);
 
   canUndo = this.store.canUndo; // use in template or in ts
@@ -53,3 +53,26 @@ public class UndoRedoComponent {
   }
 }
 ```
+
+### Rollback
+
+`rollback` lets you jump back to a specific point in time, restoring the state as it was at that moment. It works by accepting a **savepoint** — a `Date.now()` timestamp you capture before making changes.
+
+All state changes that occurred after the savepoint are moved to the redo stack, so they can still be re-applied with `redo()`.
+
+```typescript
+// 1. Capture a savepoint before making changes
+const savepoint = Date.now();
+
+// 2. Make state changes …
+store.addItem('first');
+store.addItem('second');
+
+// 3. Roll back to the savepoint — both additions are undone
+store.rollback(savepoint);
+
+// 4. The rolled-back changes are available on the redo stack
+store.canRedo(); // true
+```
+
+If the savepoint is at or after the current state (i.e. nothing to roll back), the call is a no-op.

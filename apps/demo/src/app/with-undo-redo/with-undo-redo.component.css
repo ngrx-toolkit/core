@@ -1,0 +1,36 @@
+.panels {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.card {
+  min-width: 360px;
+  flex: 1;
+}
+
+.counter-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.add-item {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.empty {
+  color: rgba(0, 0, 0, 0.54);
+  font-style: italic;
+}
