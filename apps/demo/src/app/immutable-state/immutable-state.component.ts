@@ -1,5 +1,5 @@
 import { withImmutableState } from '@angular-architects/ngrx-toolkit';
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { patchState, signalStore, withMethods } from '@ngrx/signals';

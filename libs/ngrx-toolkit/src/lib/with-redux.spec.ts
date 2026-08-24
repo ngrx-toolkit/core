@@ -2,7 +2,7 @@ import {
   HttpClient,
   HttpParams,
   provideHttpClient,
-  withXhr
+  withXhr,
 } from '@angular/common/http';
 import {
   HttpTestingController,

@@ -1,5 +1,5 @@
 import { JsonPipe } from '@angular/common';
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { patchState, signalState } from '@ngrx/signals';
 import { Flight } from '../shared/flight';

@@ -10,7 +10,8 @@
     "build:all": "nx run-many --targets=build --exclude=docs --skip-nx-cache",
     "verify:all": "nx run-many --targets=lint,test,build --exclude=docs --skip-nx-cache",
     "prepare": "husky",
-    "format:check": "prettier --check ./**/*.{js,ts,json,html,scss,md}"
+    "format:check": "prettier --check ./**/*.{js,ts,json,html,scss,md}",
+    "format:write": "prettier --write ./**/*.{js,ts,json,html,scss,md}"
   },
   "private": true,
   "engines": {

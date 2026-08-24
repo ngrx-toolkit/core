@@ -4,7 +4,12 @@ import {
   rxMutation,
 } from '@angular-architects/ngrx-toolkit';
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+} from '@angular/core';
 import { delay, Observable, of, throwError } from 'rxjs';
 
 export type Params = {
