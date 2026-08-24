@@ -1,6 +1,6 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { DatePipe } from '@angular/common';
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +20,7 @@ import { FlightBookingStore } from './flight-store';
     FormsModule,
     MatButtonModule,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [FlightBookingStore],
 })
 export class FlightSearchWithPaginationComponent {

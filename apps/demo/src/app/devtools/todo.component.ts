@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
@@ -66,6 +66,7 @@ import { TodoStore } from './todo-store';
       display: flex;
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatCheckboxModule,
     MatIconModule,

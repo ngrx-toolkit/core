@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,6 +46,7 @@ import { Todo, TodoStore } from './todo-store';
       margin-bottom: 1em;
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatCheckboxModule, MatIconModule, MatTableModule, MatButton],
 })
 export class TodoComponent {

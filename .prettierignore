@@ -4,3 +4,5 @@
 /.nx/cache
 .angular
 pnpm-lock.yaml
+
+.nx/self-healing

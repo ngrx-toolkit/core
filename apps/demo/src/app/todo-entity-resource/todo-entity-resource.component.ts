@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -17,6 +17,7 @@ import { TodoEntityResourceStore } from './todo-entity-resource.store';
     MatTableModule,
   ],
   templateUrl: './todo-entity-resource.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [],
 })
 export class TodoEntityResourceComponent {

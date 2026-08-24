@@ -16,5 +16,13 @@
     "src/**/*.d.ts",
     "src/**/tests/**/*.ts",
     "src/lib/storage-sync/tests/with-storage-sync-indexedb.spec.ts"
-  ]
+  ],
+  "angularCompilerOptions": {
+    "extendedDiagnostics": {
+      "checks": {
+        "nullishCoalescingNotNullable": "suppress",
+        "optionalChainNotNullable": "suppress"
+      }
+    }
+  }
 }

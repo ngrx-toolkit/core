@@ -1,5 +1,5 @@
 import { JsonPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { patchState, signalState } from '@ngrx/signals';
 import { Flight } from '../shared/flight';
@@ -11,6 +11,7 @@ import { injectFlightStore } from './+state/redux';
 @Component({
   imports: [JsonPipe, FormsModule, FlightCardComponent],
   selector: 'demo-flight-search-redux-connector',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './flight-search.component.html',
 })
 export class FlightSearchReducConnectorComponent {

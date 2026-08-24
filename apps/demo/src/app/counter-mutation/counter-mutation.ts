@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CounterStore } from './counter.store';
 
 @Component({
   selector: 'demo-counter-mutation',
   imports: [CommonModule],
   templateUrl: './counter-mutation.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './counter-mutation.css',
 })
 export class CounterMutation {

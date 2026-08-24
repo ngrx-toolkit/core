@@ -1,7 +1,7 @@
 import { withResource } from '@angular-architects/ngrx-toolkit';
 import { JsonPipe } from '@angular/common';
 import { httpResource } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { signalStore, withState } from '@ngrx/signals';
 import { Flight } from '../shared/flight';
 
@@ -39,6 +39,7 @@ export const FlightStore = signalStore(
     <pre>status: {{ store.listStatus() }}</pre>
     <pre>error: {{ store.listError() | json }}</pre>
     <pre>hasValue: {{ store.listHasValue() }}</pre> `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [FlightStore],
 })
 export class WithResourceComponent {

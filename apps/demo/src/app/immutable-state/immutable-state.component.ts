@@ -1,5 +1,5 @@
 import { withImmutableState } from '@angular-architects/ngrx-toolkit';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { patchState, signalStore, withMethods } from '@ngrx/signals';
@@ -44,6 +44,7 @@ const UserStore = signalStore(
     <p>Form to edit State mutable via ngModel</p>
     <input [(ngModel)]="userStore.user().name" />
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatButton, FormsModule],
 })
 export class ImmutableStateComponent {

@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,6 +11,7 @@ import { SyncedTodoStore } from './synced-todo-store';
   selector: 'demo-todo-storage-sync',
   imports: [MatCheckboxModule, MatIconModule, MatTableModule, MatButton],
   templateUrl: './todo-storage-sync.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './todo-storage-sync.component.scss',
 })
 export class TodoStorageSyncComponent {
