@@ -4,12 +4,7 @@ import {
   rxMutation,
 } from '@angular-architects/ngrx-toolkit';
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  signal,
-} from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { delay, Observable, of, throwError } from 'rxjs';
 
 export type Params = {
@@ -28,7 +23,6 @@ export type CounterResponse = {
   selector: 'demo-counter-rx-mutation',
   imports: [CommonModule],
   templateUrl: './counter-rx-mutation.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './counter-rx-mutation.css',
 })
 export class CounterRxMutation {

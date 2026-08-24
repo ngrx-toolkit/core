@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-  ViewChild,
-  inject,
-} from '@angular/core';
+import { Component, Input, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Flight } from '../shared/flight';
@@ -14,7 +7,6 @@ import { FlightBookingStore } from './flight-booking.store';
 @Component({
   imports: [RouterModule, FormsModule],
   selector: 'demo-flight-edit',
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './flight-edit.component.html',
 })
 export class FlightEditDynamicComponent implements OnInit {

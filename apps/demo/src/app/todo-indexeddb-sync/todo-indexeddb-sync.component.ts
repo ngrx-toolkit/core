@@ -1,10 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-} from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,7 +12,6 @@ import { SyncedTodoStore } from './synced-todo-store';
   imports: [MatCheckboxModule, MatIconModule, MatTableModule, MatButton],
   templateUrl: './todo-indexeddb-sync.component.html',
   styleUrl: './todo-indexeddb-sync.component.scss',
-  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: true,
 })
 export class TodoIndexeddbSyncComponent {

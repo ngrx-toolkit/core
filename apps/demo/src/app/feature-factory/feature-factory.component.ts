@@ -1,5 +1,5 @@
 import { withFeatureFactory } from '@angular-architects/ngrx-toolkit';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import {
@@ -54,7 +54,6 @@ const UserStore = signalStore(
 
     <p>Current User: {{ userStore.entity()?.name || '-' }}</p>
   `,
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatButton, FormsModule],
 })
 export class FeatureFactoryComponent {

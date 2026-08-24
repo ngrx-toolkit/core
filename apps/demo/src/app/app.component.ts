@@ -1,5 +1,5 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -25,7 +25,6 @@ import { map } from 'rxjs';
     MatSidenavModule,
     MatButtonModule,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     .container {
       display: inline;

@@ -1,12 +1,5 @@
 import { withConditional } from '@angular-architects/ngrx-toolkit';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  signal,
-  untracked,
-} from '@angular/core';
+import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import {
@@ -56,7 +49,6 @@ const UserStore = signalStore(
 @Component({
   selector: 'demo-conditional-user',
   template: `<p>Current User {{ userStore.name() }}</p>`,
-  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [UserStore],
 })
 class ConditionalUserComponent {
@@ -90,7 +82,6 @@ class ConditionalUserComponent {
       <demo-conditional-user />
     }
   `,
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     FormsModule,
     MatButtonToggle,

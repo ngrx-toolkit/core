@@ -1,5 +1,5 @@
 import { JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { FlightCardComponent } from '../shared/flight-card.component';
@@ -8,7 +8,6 @@ import { FlightBookingStore } from './flight-booking.store';
 @Component({
   imports: [JsonPipe, FormsModule, FlightCardComponent, RouterLink],
   selector: 'demo-flight-search',
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './flight-search.component.html',
 })
 export class FlightSearchDynamicComponent {

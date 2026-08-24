@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -128,7 +128,6 @@ import { BookStore } from './book.store';
       </mat-card>
     }
   `,
-  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [
     `
       mat-card {
@@ -153,7 +152,7 @@ import { BookStore } from './book.store';
 export class EventsSampleComponent {
   readonly store = inject(BookStore);
   readonly dispatch = injectDispatch(bookEvents);
-  filterText = '';
+  filterText = signal('');
 
   toggleStock(bookId: string, event: Event) {
     event.stopPropagation();
