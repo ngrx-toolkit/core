@@ -1,4 +1,4 @@
-import { httpResource, provideHttpClient } from '@angular/common/http';
+import { httpResource, provideHttpClient, withXhr } from '@angular/common/http';
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -332,7 +332,7 @@ describe('withResource', () => {
         );
 
         TestBed.configureTestingModule({
-          providers: [provideHttpClient(), provideHttpClientTesting()],
+          providers: [provideHttpClient(withXhr()), provideHttpClientTesting()],
         });
 
         const store = TestBed.inject(Store);

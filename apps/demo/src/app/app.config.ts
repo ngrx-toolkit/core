@@ -1,5 +1,9 @@
 import { LayoutModule } from '@angular/cdk/layout';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptors,
+  withXhr,
+} from '@angular/common/http';
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
@@ -10,7 +14,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(appRoutes, withComponentInputBinding()),
     provideAnimations(),
-    provideHttpClient(withInterceptors([memoryHttpInterceptor])),
+    provideHttpClient(withXhr(), withInterceptors([memoryHttpInterceptor])),
     importProvidersFrom(LayoutModule),
   ],
 };

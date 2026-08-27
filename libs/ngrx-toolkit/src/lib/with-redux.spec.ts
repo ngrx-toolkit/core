@@ -2,6 +2,7 @@ import {
   HttpClient,
   HttpParams,
   provideHttpClient,
+  withXhr,
 } from '@angular/common/http';
 import {
   HttpTestingController,
@@ -45,7 +46,7 @@ const createFlight = (flight: Partial<Flight> = {}) => {
 describe('with redux', () => {
   it('should load flights', () => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(withXhr()), provideHttpClientTesting()],
     });
 
     TestBed.runInInjectionContext(() => {

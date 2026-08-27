@@ -1,5 +1,5 @@
 import { JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -20,7 +20,6 @@ import { SimpleFlightBookingStore } from './flight-booking-simple.store';
   ],
   selector: 'demo-flight-search',
   templateUrl: './flight-search-simple.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlightSearchSimpleComponent {
   private store = inject(SimpleFlightBookingStore);

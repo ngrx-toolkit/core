@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -21,7 +21,7 @@ import { TodoEntityResourceStore } from './todo-entity-resource.store';
 })
 export class TodoEntityResourceComponent {
   protected readonly store = inject(TodoEntityResourceStore);
-  protected newTitle = '';
+  protected newTitle = signal('');
   protected readonly dataSource = new MatTableDataSource<{
     id: number;
     title: string;
@@ -43,11 +43,11 @@ export class TodoEntityResourceComponent {
   }
   trackById = (_: number, t: { id: number }) => t.id;
   add() {
-    const title = this.newTitle.trim();
+    const title = this.newTitle().trim();
     if (!title) return;
     const ids = this.store.ids() as Array<number>;
     const nextId = ids.length ? Math.max(...ids) + 1 : 1;
     this.store.addTodo({ id: nextId, title, completed: false });
-    this.newTitle = '';
+    this.newTitle.set('');
   }
 }

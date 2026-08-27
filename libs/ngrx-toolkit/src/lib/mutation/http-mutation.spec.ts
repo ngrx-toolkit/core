@@ -1,4 +1,8 @@
-import { HttpEventType, provideHttpClient } from '@angular/common/http';
+import {
+  HttpEventType,
+  provideHttpClient,
+  withXhr,
+} from '@angular/common/http';
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -29,7 +33,7 @@ describe('httpMutation', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(withXhr()), provideHttpClientTesting()],
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
