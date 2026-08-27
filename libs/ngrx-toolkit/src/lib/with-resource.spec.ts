@@ -14,7 +14,7 @@ import {
   withState,
 } from '@ngrx/signals';
 import { of } from 'rxjs';
-import { Assert, AssertNot, IsEqual, Satisfies } from './test-utils/types';
+import { Assert, IsEqual, Satisfies } from './test-utils/types';
 import { ErrorHandling, mapToResource, withResource } from './with-resource';
 import { Address, venice, vienna } from './with-resource/tests/util/fixtures';
 import { paramsForResourceTypes } from './with-resource/tests/util/params-for-resource-types';
@@ -394,7 +394,7 @@ describe('withResource', () => {
         }
       });
 
-      it('fails on hasValue as type predicate when not explicitly typed', () => {
+      it('removes undefined from the inferred value type after hasValue', () => {
         const Store = signalStore(
           { providedIn: 'root' },
           withResource(() => resource({ loader: () => Promise.resolve(1) })),
@@ -402,7 +402,7 @@ describe('withResource', () => {
         const store = TestBed.inject(Store);
         if (store.hasValue()) {
           const _value = store.value();
-          type _T1 = AssertNot<IsEqual<typeof _value, number>>;
+          type _T1 = Assert<IsEqual<typeof _value, number>>;
         }
       });
     });
@@ -449,7 +449,7 @@ describe('withResource', () => {
         }
       });
 
-      it('fails on hasValue as type predicate when not explicitly typed', () => {
+      it('removes undefined from the inferred value type after hasValue', () => {
         const Store = signalStore(
           { providedIn: 'root' },
           withResource(() => resource({ loader: () => Promise.resolve(1) }), {
@@ -459,7 +459,7 @@ describe('withResource', () => {
         const store = TestBed.inject(Store);
         if (store.hasValue()) {
           const _value = store.value();
-          type _T1 = AssertNot<IsEqual<typeof _value, number>>;
+          type _T1 = Assert<IsEqual<typeof _value, number>>;
         }
       });
     });
@@ -506,7 +506,7 @@ describe('withResource', () => {
           }
         });
 
-        it('fails on hasValue as type predicate when not explicitly typed', () => {
+        it('removes undefined from the inferred value type after hasValue', () => {
           const Store = signalStore(
             { providedIn: 'root' },
             withResource(() => resource({ loader: () => Promise.resolve(1) }), {
@@ -516,7 +516,7 @@ describe('withResource', () => {
           const store = TestBed.inject(Store);
           if (store.hasValue()) {
             const _value = store.value();
-            type _T1 = AssertNot<IsEqual<typeof _value, number>>;
+            type _T1 = Assert<IsEqual<typeof _value, number>>;
           }
         });
       },

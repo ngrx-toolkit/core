@@ -29,7 +29,9 @@ export type ResourceResult<T> = {
     snapshot: Signal<ResourceSnapshot<T>>;
   };
   methods: {
-    hasValue(): this is Resource<Exclude<T, undefined>>;
+    hasValue: <R extends Resource<T>>(
+      this: R,
+    ) => this is Resource<Exclude<T, undefined>> & R;
     _reload(): boolean;
   };
 };
