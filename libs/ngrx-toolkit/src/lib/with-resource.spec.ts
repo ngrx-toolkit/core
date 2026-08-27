@@ -3,7 +3,7 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
-import { Resource, resource, Signal } from '@angular/core';
+import { Resource, resource, ResourceSnapshot, Signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { TestBed } from '@angular/core/testing';
 import {
@@ -539,6 +539,17 @@ describe('withResource', () => {
           ),
         );
       });
+      it('exposes the resource snapshot', () => {
+        const Store = signalStore(
+          { providedIn: 'root' },
+          withResource(() => resource({ loader: () => Promise.resolve(1) })),
+        );
+        const _store = TestBed.inject(Store);
+        const _snapshot = _store.snapshot();
+        type _T1 = Assert<
+          IsEqual<typeof _snapshot, ResourceSnapshot<number | undefined>>
+        >;
+      });
     });
 
     describe('named resources', () => {
@@ -557,6 +568,19 @@ describe('withResource', () => {
             }),
           })),
         );
+      });
+      it('exposes the resource snapshot for named resources', () => {
+        const Store = signalStore(
+          { providedIn: 'root' },
+          withResource(() => ({
+            user: resource({ loader: () => Promise.resolve(1) }),
+          })),
+        );
+        const _store = TestBed.inject(Store);
+        const _snapshot = _store.userSnapshot();
+        type _T1 = Assert<
+          IsEqual<typeof _snapshot, ResourceSnapshot<number | undefined>>
+        >;
       });
     });
 
@@ -624,6 +648,22 @@ describe('withResource', () => {
 
         const _store = mapToResource(TestBed.inject(Store), 'id');
         type _T1 = Assert<IsEqual<typeof _store, Resource<number | undefined>>>;
+      });
+
+      it('exposes the resource snapshot for named resources', () => {
+        const Store = signalStore(
+          { providedIn: 'root' },
+          withResource(() => ({
+            user: resource({ loader: () => Promise.resolve(1) }),
+          })),
+        );
+
+        const _store = TestBed.inject(Store);
+        const _resource = mapToResource(_store, 'user');
+        const _snapshot = _resource.snapshot();
+        type _T1 = Assert<
+          IsEqual<typeof _snapshot, ResourceSnapshot<number | undefined>>
+        >;
       });
 
       it('satisfies the Resource interface with default value and native error handling', () => {
