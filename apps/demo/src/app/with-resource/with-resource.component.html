@@ -1,0 +1,16 @@
+@if (store.normalResource.hasValue()) {
+<p>RX Resource Value: {{ store.normalResource.value() | json }}</p>
+} @else {
+<p>No RX Resource Value Yet</p>
+}
+
+@if (store.hasValue()) {
+<p>Current Value: {{ store.value()| json }}</p>
+} @else {
+<p>No Value Yet</p>
+}
+
+@if (store.listHasValue()) {
+<!-- Not narrowing -->
+<p>Current Value: {{ store.listValue() | json }}</p>
+}
