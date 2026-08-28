@@ -462,6 +462,29 @@ describe('withResource', () => {
           type _T1 = Assert<IsEqual<typeof _value, number>>;
         }
       });
+      // Named resource is not narrowing
+      it('removes undefined from the inferred value type after hasValue', () => {
+        const Store = signalStore(
+          { providedIn: 'root' },
+          withResource(
+            () => {
+              return {
+                thing: resource({
+                  loader: () => Promise.resolve(1),
+                }),
+              };
+            },
+            {
+              errorHandling: 'native',
+            },
+          ),
+        );
+        const store = TestBed.inject(Store);
+        if (store.thingHasValue()) {
+          const _value = store.thingValue();
+          type _T1 = Assert<IsEqual<typeof _value, number>>;
+        }
+      });
     });
 
     describe.each(['previous value', 'native'] as const)(
