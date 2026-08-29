@@ -463,8 +463,8 @@ describe('withResource', () => {
         }
       });
 
-      it('removes undefined from the inferred value type after hasValue for named resources', () => {
-        const Store = signalStore(
+      it('removes undefined from the inferred value type after hasValue for named resources (no defaults)', () => {
+        const StoreNativeError = signalStore(
           { providedIn: 'root' },
           withResource(
             () => {
@@ -479,12 +479,154 @@ describe('withResource', () => {
             },
           ),
         );
-        const store = TestBed.inject(Store);
+        const store = TestBed.inject(StoreNativeError);
+
+        const _valueNative = store.thingValue();
+        type _TNative = Assert<
+          IsEqual<typeof _valueNative, number | undefined>
+        >;
+
         if (store.thingHasValue()) {
           const _value = store.thingValue();
           type _T1 = Assert<IsEqual<typeof _value, number>>;
         }
+
+        const StorePreviousValue = signalStore(
+          { providedIn: 'root' },
+          withResource(
+            () => {
+              return {
+                thing: resource({
+                  loader: () => Promise.resolve(1),
+                }),
+              };
+            },
+            {
+              errorHandling: 'previous value',
+            },
+          ),
+        );
+        const storePreviousValue = TestBed.inject(StorePreviousValue);
+
+        const _valuePrevious = storePreviousValue.thingValue();
+        type _TPrev = Assert<
+          IsEqual<typeof _valuePrevious, number | undefined>
+        >;
+
+        if (storePreviousValue.thingHasValue()) {
+          const _value = storePreviousValue.thingValue();
+          type _T1 = Assert<IsEqual<typeof _value, number>>;
+        }
+
+        const StoreUndefinedValue = signalStore(
+          { providedIn: 'root' },
+          withResource(
+            () => {
+              return {
+                thing: resource({
+                  loader: () => Promise.resolve(1),
+                }),
+              };
+            },
+            {
+              errorHandling: 'undefined value',
+            },
+          ),
+        );
+        const storeUndefinedValue = TestBed.inject(StoreUndefinedValue);
+
+        const _valueUndefined = storeUndefinedValue.thingValue();
+        type _TUndefined = Assert<
+          IsEqual<typeof _valueUndefined, number | undefined>
+        >;
+
+        if (storeUndefinedValue.thingHasValue()) {
+          const _value = storeUndefinedValue.thingValue();
+          type _T1 = Assert<IsEqual<typeof _value, number>>;
+        }
       });
+    });
+
+    it('removes undefined from the inferred value type after hasValue for named resources (defaults)', () => {
+      const StoreNativeError = signalStore(
+        { providedIn: 'root' },
+        withResource(
+          () => {
+            return {
+              thing: resource({
+                loader: () => Promise.resolve(1),
+                defaultValue: 0,
+              }),
+            };
+          },
+          {
+            errorHandling: 'native',
+          },
+        ),
+      );
+      const store = TestBed.inject(StoreNativeError);
+
+      const _valueNative = store.thingValue();
+      type _TNative = Assert<IsEqual<typeof _valueNative, number>>;
+
+      if (store.thingHasValue()) {
+        const _value = store.thingValue();
+        type _T1 = Assert<IsEqual<typeof _value, number>>;
+      }
+
+      const StorePreviousValue = signalStore(
+        { providedIn: 'root' },
+        withResource(
+          () => {
+            return {
+              thing: resource({
+                loader: () => Promise.resolve(1),
+                defaultValue: 0,
+              }),
+            };
+          },
+          {
+            errorHandling: 'previous value',
+          },
+        ),
+      );
+      const storePreviousValue = TestBed.inject(StorePreviousValue);
+
+      const _valuePrevious = storePreviousValue.thingValue();
+      type _TPrev = Assert<IsEqual<typeof _valuePrevious, number>>;
+
+      if (storePreviousValue.thingHasValue()) {
+        const _value = storePreviousValue.thingValue();
+        type _T1 = Assert<IsEqual<typeof _value, number>>;
+      }
+
+      const StoreUndefinedValue = signalStore(
+        { providedIn: 'root' },
+        withResource(
+          () => {
+            return {
+              thing: resource({
+                loader: () => Promise.resolve(1),
+                defaultValue: 0,
+              }),
+            };
+          },
+          {
+            errorHandling: 'undefined value',
+          },
+        ),
+      );
+      const storeUndefinedValue = TestBed.inject(StoreUndefinedValue);
+
+      const _valueUndefined = storeUndefinedValue.thingValue();
+      type _TUndefined = Assert<
+        IsEqual<typeof _valueUndefined, number | undefined>
+      >;
+
+      if (storeUndefinedValue.thingHasValue()) {
+        const _value = storeUndefinedValue.thingValue();
+        type _T1 = Assert<IsEqual<typeof _value, number>>;
+      }
     });
 
     describe.each(['previous value', 'native'] as const)(
