@@ -60,9 +60,26 @@ export type NamedResourceResult<
     [Prop in keyof T as `${Prop & string}Snapshot`]: T[Prop]['snapshot'];
   };
   methods: {
-    [Prop in keyof T as `${Prop & string}HasValue`]: () => this is Resource<
-      Exclude<T[Prop]['value'], undefined>
-    >;
+    [Prop in keyof T as `${Prop & string}HasValue`]: <
+      R extends Record<
+        `${Prop & string}Value`,
+        Signal<
+          T[Prop]['value'] extends Signal<infer S>
+            ? HasUndefinedErrorHandling extends true
+              ? S | undefined
+              : S
+            : never
+        >
+      >,
+    >(
+      this: R,
+    ) => this is Record<
+      `${Prop & string}Value`,
+      Signal<
+        Exclude<T[Prop]['value'] extends Signal<infer S> ? S : never, undefined>
+      >
+    > &
+      R;
   } & {
     [Prop in keyof T as `_${Prop & string}Reload`]: () => boolean;
   };

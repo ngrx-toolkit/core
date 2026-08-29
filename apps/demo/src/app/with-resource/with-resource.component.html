@@ -1,0 +1,19 @@
+,
+<h1>withResource</h1>
+<a
+  href="https://ngrx-toolkit.angulararchitects.io/docs/with-resource"
+  target="_blank"
+  >withResource doc page</a
+>
+
+<h2>Single Resource</h2>
+<pre>value: {{ store.value() | json }}</pre>
+<pre>status: {{ store.status() }}</pre>
+<pre>error: {{ store.error() | json }}</pre>
+<pre>hasValue: {{ store.hasValue() }}</pre>
+
+<h2>Named Resource</h2>
+<pre>{{ store.listValue() | json }}</pre>
+<pre>status: {{ store.listStatus() }}</pre>
+<pre>error: {{ store.listError() | json }}</pre>
+<pre>hasValue: {{ store.listHasValue() }}</pre>

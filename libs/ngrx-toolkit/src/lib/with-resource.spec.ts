@@ -462,8 +462,8 @@ describe('withResource', () => {
           type _T1 = Assert<IsEqual<typeof _value, number>>;
         }
       });
-      // Named resource is not narrowing
-      it('removes undefined from the inferred value type after hasValue', () => {
+
+      it('removes undefined from the inferred value type after hasValue for named resources', () => {
         const Store = signalStore(
           { providedIn: 'root' },
           withResource(
