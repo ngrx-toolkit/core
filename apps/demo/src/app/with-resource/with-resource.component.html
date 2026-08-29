@@ -1,4 +1,3 @@
-,
 <h1>withResource</h1>
 <a
   href="https://ngrx-toolkit.angulararchitects.io/docs/with-resource"
@@ -11,9 +10,15 @@
 <pre>status: {{ store.status() }}</pre>
 <pre>error: {{ store.error() | json }}</pre>
 <pre>hasValue: {{ store.hasValue() }}</pre>
+@if (store.hasValue()) {
+  <pre>value: {{ store.value() | json }}</pre>
+}
 
 <h2>Named Resource</h2>
 <pre>{{ store.listValue() | json }}</pre>
 <pre>status: {{ store.listStatus() }}</pre>
 <pre>error: {{ store.listError() | json }}</pre>
 <pre>hasValue: {{ store.listHasValue() }}</pre>
+@if (store.listHasValue()) {
+  <pre>value: {{ store.listValue() | json }}</pre>
+}
