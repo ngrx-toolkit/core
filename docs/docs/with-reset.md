@@ -3,7 +3,7 @@ title: withReset()
 ---
 
 ```typescript
-import { withReset } from '@angular-architects/ngrx-toolkit';
+import { withReset } from '@ngrx-toolkit/core';
 ```
 
 `withReset()` adds a method to reset the state of the Signal Store to its initial value. Nothing more to say about it 😅
@@ -11,7 +11,7 @@ import { withReset } from '@angular-architects/ngrx-toolkit';
 Example:
 
 ```typescript
-import { withReset } from '@angular-architects/ngrx-toolkit';
+import { withReset } from '@ngrx-toolkit/core';
 
 const Store = signalStore(
   withState({
@@ -41,7 +41,7 @@ console.log(store.user()); // { id: 1, name: 'Konrad' }
 ## `setResetState()`
 
 ```typescript
-import { setResetState } from '@angular-architects/ngrx-toolkit';
+import { setResetState } from '@ngrx-toolkit/core';
 ```
 
 If you want to set a custom reset state, you can use the `setResetState()` method.
@@ -50,7 +50,7 @@ Example:
 
 ```typescript
 // continue from the previous example
-import { setResetState } from '@angular-architects/ngrx-toolkit';
+import { setResetState } from '@ngrx-toolkit/core';
 
 setResetState(store, { user: { id: 3, name: 'Jane' }, address: { city: 'Berlin', zip: '10115' } });
 store.changeUser(4, 'Alice');

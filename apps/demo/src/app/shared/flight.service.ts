@@ -1,6 +1,6 @@
-import { DataService } from '@angular-architects/ngrx-toolkit';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { DataService } from '@ngrx-toolkit/core';
 import { EntityId } from '@ngrx/signals/entities';
 import { firstValueFrom, Observable } from 'rxjs';
 import { Flight } from './flight';

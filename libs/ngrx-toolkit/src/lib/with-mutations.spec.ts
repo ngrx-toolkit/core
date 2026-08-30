@@ -538,7 +538,7 @@ describe('withMutations with rxMutation', () => {
   });
 
   it('does not expose mutation properties directly, only the method', async () => {
-    // Test case for https://github.com/angular-architects/ngrx-toolkit/issues/286
+    // Test case for https://github.com/ngrx-toolkit/ngrx-toolkit/issues/286
     const testSetup = createTestSetup(switchOp);
     const store = testSetup.store;
 
@@ -548,7 +548,7 @@ describe('withMutations with rxMutation', () => {
   });
 
   it('types mutation method as plain callable Promise signature and returns nothing else from a mutation', () => {
-    // Test case for https://github.com/angular-architects/ngrx-toolkit/issues/286
+    // Test case for https://github.com/ngrx-toolkit/ngrx-toolkit/issues/286
     const testSetup = createTestSetup();
     const store = testSetup.store;
 

@@ -11,7 +11,7 @@ As Web Storage and IndexedDB only work in browser environments, it will fallback
 Example:
 
 ```typescript
-import { withStorageSync } from '@angular-architects/ngrx-toolkit';
+import { withStorageSync } from '@ngrx-toolkit/core';
 
 const UserStore = signalStore(
   withState({ name: 'John' }),
@@ -109,7 +109,7 @@ const UserStore = signalStore(
 Use `withSessionStorage()` to synchronize with `sessionStorage` instead of `localStorage`.
 
 ```typescript
-import { withSessionStorage, withStorageSync } from '@angular-architects/ngrx-toolkit';
+import { withSessionStorage, withStorageSync } from '@ngrx-toolkit/core';
 
 const UserStore = signalStore(withState({ name: 'John' }), withStorageSync('user', withSessionStorage()));
 ```
@@ -124,7 +124,7 @@ Notes:
 Use `withIndexedDB()` to synchronize with IndexedDB. Because IndexedDB is asynchronous, all reads and writes are performed asynchronously. You must wait for the initial read during app initialization (via `whenSynced()`), and we recommend disabling auto sync for predictable sequencing and better DX (avoids sprinkling `whenSynced()` after each change).
 
 ```typescript
-import { withIndexedDB, withStorageSync } from '@angular-architects/ngrx-toolkit';
+import { withIndexedDB, withStorageSync } from '@ngrx-toolkit/core';
 import { withHooks, patchState } from '@ngrx/signals';
 
 // Recommended: disable autoSync to control sequencing explicitly

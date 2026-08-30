@@ -15,4 +15,4 @@ import Team from '@site/src/components/Team';
 
 ## Contribute
 
-We welcome contributions from the community! If you're interested in contributing to NgRx Toolkit, check out our [GitHub repository](https://github.com/angular-architects/ngrx-toolkit) and our [contribution guidelines](https://github.com/angular-architects/ngrx-toolkit/blob/main/CONTRIBUTING.md).
+We welcome contributions from the community! If you're interested in contributing to NgRx Toolkit, check out our [GitHub repository](https://github.com/ngrx-toolkit/ngrx-toolkit) and our [contribution guidelines](https://github.com/ngrx-toolkit/ngrx-toolkit/blob/main/CONTRIBUTING.md).

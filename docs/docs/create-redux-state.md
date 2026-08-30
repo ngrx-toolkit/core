@@ -3,12 +3,12 @@ title: createReduxState()
 ---
 
 ```typescript
-import { createReduxState } from '@angular-architects/ngrx-toolkit/redux-connector';
+import { createReduxState } from '@ngrx-toolkit/core/redux-connector';
 ```
 
 The Redux Connector it is not an extension but turns any `signalStore()` into a Global State Management Slice following the Redux pattern.
 
-It is available as secondary entry point, i.e. `import { createReduxState } from '@angular-architects/ngrx-toolkit/redux-connector'` and has a dependency to `@ngrx/store`.
+It is available as secondary entry point, i.e. `import { createReduxState } from '@ngrx-toolkit/core/redux-connector'` and has a dependency to `@ngrx/store`.
 
 An extension without dependency to `@ngrx/store` is available with [`withRedux()`](./with-redux).
 

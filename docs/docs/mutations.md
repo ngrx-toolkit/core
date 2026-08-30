@@ -3,20 +3,20 @@ title: Mutations
 ---
 
 ```typescript
-import { httpMutation } from '@angular-architects/ngrx-toolkit';
+import { httpMutation } from '@ngrx-toolkit/core';
 ```
 
 ```typescript
-import { rxMutation } from '@angular-architects/ngrx-toolkit';
+import { rxMutation } from '@ngrx-toolkit/core';
 ```
 
 ```typescript
-import { withMutations } from '@angular-architects/ngrx-toolkit';
+import { withMutations } from '@ngrx-toolkit/core';
 ```
 
 ```typescript
 // Optional, `concatOp` is the default.
-import { concatOp, exhaustOp, mergeOp, switchOp } from '@angular-architects/ngrx-toolkit';
+import { concatOp, exhaustOp, mergeOp, switchOp } from '@ngrx-toolkit/core';
 ```
 
 ## Basic Usage
@@ -34,7 +34,7 @@ This guide covers
   - State signals available (`value/status/error/isPending`)
       <!-- TODO - resolve when #235 closed-->
     - For `httpMutation`, the response type is specified with the param `parse: (res: T) => res as T`
-    - `hasValue` signal to narrow type. ⚠️NOTE⚠️: currently there is an [outstanding bug](https://github.com/angular-architects/ngrx-toolkit/issues/235) that this does not properly narrow.
+    - `hasValue` signal to narrow type. ⚠️NOTE⚠️: currently there is an [outstanding bug](https://github.com/ngrx-toolkit/ngrx-toolkit/issues/235) that this does not properly narrow.
   - [How to use](#usage-withmutations-or-solo-functions), as:
     - _standalone functions_
     - In `withMutations` store _feature_
@@ -185,7 +185,7 @@ Enables handling race conditions
 increment: rxMutation({
   // ...
   // Passing in a custom option. Need to import like:
-  // import { switchOp } from '@angular-architects/ngrx-toolkit'
+  // import { switchOp } from '@ngrx-toolkit/core'
   operator: mergeOp, // `concatOp` is the default if `operator` is omitted
 }),
 
@@ -337,7 +337,7 @@ class CounterMutation {
   increment: rxMutation({
     // ...
     // Passing in a custom option. Need to import like:
-    // import { switchOp } from '@angular-architects/ngrx-toolkit'
+    // import { switchOp } from '@ngrx-toolkit/core'
     operator: mergeOp, // `concatOp` is the default if `operator` is omitted
   }),
 })),
@@ -410,7 +410,7 @@ This example is a dedicated store with `withMutations` and used in a component, 
 ### Declare
 
 ```ts
-import { concatOp, httpMutation, rxMutation, withMutations } from '@angular-architects/ngrx-toolkit';
+import { concatOp, httpMutation, rxMutation, withMutations } from '@ngrx-toolkit/core';
 import { patchState, signalStore, withState } from '@ngrx/signals';
 import { delay, Observable } from 'rxjs';
 

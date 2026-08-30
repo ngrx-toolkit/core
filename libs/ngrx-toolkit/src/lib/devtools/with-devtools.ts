@@ -15,7 +15,7 @@ import {
 import { DevtoolsSyncer } from './internal/devtools-syncer.service';
 import { ReduxDevtoolsExtension } from './internal/models';
 
-// Users requested that we export this type: https://github.com/angular-architects/ngrx-toolkit/issues/178
+// Users requested that we export this type: https://github.com/ngrx-toolkit/ngrx-toolkit/issues/178
 export type DevtoolsFeature = DevtoolsFeatureInternal;
 
 declare global {

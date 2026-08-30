@@ -3,7 +3,7 @@ title: withEntityResources()
 ---
 
 ```typescript
-import { withEntityResources } from '@angular-architects/ngrx-toolkit';
+import { withEntityResources } from '@ngrx-toolkit/core';
 ```
 
 `withEntityResources()` integrates Angular Resources that return arrays into NgRx SignalStore using the Entity helpers from `@ngrx/signals/entities`.
@@ -42,7 +42,7 @@ withEntityResources<
 import { signalStore, withState, patchState } from '@ngrx/signals';
 import { resource } from '@angular/core';
 import { addEntity } from '@ngrx/signals/entities';
-import { withEntityResources } from '@angular-architects/ngrx-toolkit';
+import { withEntityResources } from '@ngrx-toolkit/core';
 
 export type Todo = { id: number; title: string; completed: boolean };
 
@@ -66,7 +66,7 @@ The store now provides:
 ```typescript
 import { signalStore } from '@ngrx/signals';
 import { resource } from '@angular/core';
-import { withEntityResources } from '@angular-architects/ngrx-toolkit';
+import { withEntityResources } from '@ngrx-toolkit/core';
 
 export type Todo = { id: number; title: string; completed: boolean };
 
@@ -144,7 +144,7 @@ patchState(store, removeEntity(3, { collection: 'todos' }));
 See the demo store `todo-entity-resource` for a full example that combines mutations and entity resources.
 
 ```typescript
-import { httpMutation, withMutations, withEntityResources } from '@angular-architects/ngrx-toolkit';
+import { httpMutation, withMutations, withEntityResources } from '@ngrx-toolkit/core';
 import { inject, resource } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { addEntity, removeEntity, updateEntity } from '@ngrx/signals/entities';

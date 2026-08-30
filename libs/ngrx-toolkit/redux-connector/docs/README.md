@@ -1,6 +1,6 @@
 # Redux Connector for the NgRx Signal Store `createReduxState()`
 
-The Redux Connector turns any `signalStore()` into a Global State Management Slice following the Redux pattern. It is available as secondary entry point, i.e. `import { createReduxState } from '@angular-architects/ngrx-toolkit/redux-connector'` and has a dependency to `@ngrx/store`.
+The Redux Connector turns any `signalStore()` into a Global State Management Slice following the Redux pattern. It is available as secondary entry point, i.e. `import { createReduxState } from '@ngrx-toolkit/core/redux-connector'` and has a dependency to `@ngrx/store`.
 
 It supports:
 

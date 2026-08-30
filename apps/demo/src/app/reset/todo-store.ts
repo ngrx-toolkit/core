@@ -1,4 +1,4 @@
-import { setResetState, withReset } from '@angular-architects/ngrx-toolkit';
+import { setResetState, withReset } from '@ngrx-toolkit/core';
 import {
   getState,
   patchState,

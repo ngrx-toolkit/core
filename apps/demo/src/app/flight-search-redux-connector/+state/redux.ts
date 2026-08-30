@@ -2,7 +2,7 @@ import {
   createReduxState,
   mapAction,
   withActionMappers,
-} from '@angular-architects/ngrx-toolkit/redux-connector';
+} from '@ngrx-toolkit/core/redux-connector';
 import { ticketActions } from './actions';
 import { FlightStore } from './store';
 

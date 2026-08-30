@@ -1,5 +1,5 @@
-import { reduxMethod } from '@angular-architects/ngrx-toolkit/redux-connector';
 import { computed, inject } from '@angular/core';
+import { reduxMethod } from '@ngrx-toolkit/core/redux-connector';
 import {
   patchState,
   signalStore,

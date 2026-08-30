@@ -1,9 +1,9 @@
+import { inject, resource } from '@angular/core';
 import {
   httpMutation,
   withEntityResources,
   withMutations,
-} from '@angular-architects/ngrx-toolkit';
-import { inject, resource } from '@angular/core';
+} from '@ngrx-toolkit/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { addEntity, removeEntity, updateEntity } from '@ngrx/signals/entities';
 import { firstValueFrom } from 'rxjs';

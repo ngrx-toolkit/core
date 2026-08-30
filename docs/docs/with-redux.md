@@ -4,7 +4,7 @@ title: withRedux()
 
 ```typescript
 // DEPRECATED
-import { withRedux } from '@angular-architects/ngrx-toolkit';
+import { withRedux } from '@ngrx-toolkit/core';
 
 // Use `@ngrx/signals/events` instead
 ```
@@ -27,7 +27,7 @@ There is also a [Redux Connector](./create-redux-state) available, which is a se
 Example:
 
 ```typescript
-import { withRedux } from '@angular-architects/ngrx-toolkit';
+import { withRedux } from '@ngrx-toolkit/core';
 
 export const FlightStore = signalStore(
   { providedIn: 'root' },
@@ -66,11 +66,11 @@ export const FlightStore = signalStore(
 ## Extracting actions, reducer and effects into separate files
 
 ```typescript
-import { createReducer } from '@angular-architects/ngrx-toolkit';
+import { createReducer } from '@ngrx-toolkit/core';
 ```
 
 ```typescript
-import { createEffects } from '@angular-architects/ngrx-toolkit';
+import { createEffects } from '@ngrx-toolkit/core';
 ```
 
 `createReducer` and `createEffects` allow you to extract the reducer and effects into separate files.
@@ -80,7 +80,7 @@ There is no need for a `createActions` function, because the actions are just an
 Example:
 
 ```typescript
-import { withRedux, createReducer, createEffects } from '@angular-architects/ngrx-toolkit';
+import { withRedux, createReducer, createEffects } from '@ngrx-toolkit/core';
 
 interface FlightState {
   flights: Flight[];
@@ -133,7 +133,7 @@ signalStore(
 ### Configuring the Redux Devtools Extension
 
 ```typescript
-import { provideDevtoolsConfig } from '@angular-architects/ngrx-toolkit';
+import { provideDevtoolsConfig } from '@ngrx-toolkit/core';
 ```
 
 The `provideDevtoolsConfig` function allows you to configure the Redux DevTools integration for your NgRx SignalStore. This function is essential for setting up the DevTools with custom options. The function only needs to be called once in your appConfig or AppModule.
@@ -145,7 +145,7 @@ Here is an example of how to use it with the standalone api:
 ```typescript
 // app.config.ts
 import { ApplicationConfig } from '@angular/core';
-import { provideDevtoolsConfig } from '@angular-architects/ngrx-toolkit';
+import { provideDevtoolsConfig } from '@ngrx-toolkit/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [

@@ -3,7 +3,7 @@ title: withUndoRedo()
 ---
 
 ```typescript
-import { withUndoRedo } from '@angular-architects/ngrx-toolkit';
+import { withUndoRedo } from '@ngrx-toolkit/core';
 ```
 
 `withUndoRedo` adds undo and redo functionality to the store.
@@ -11,8 +11,8 @@ import { withUndoRedo } from '@angular-architects/ngrx-toolkit';
 Example:
 
 ```typescript
-import { withUndoRedo } from '@angular-architects/ngrx-toolkit';
-import { clearUndoRedo } from '@angular-architects/ngrx-toolkit';
+import { withUndoRedo } from '@ngrx-toolkit/core';
+import { clearUndoRedo } from '@ngrx-toolkit/core';
 
 const SyncStore = signalStore(
   withUndoRedo({
@@ -25,7 +25,7 @@ const SyncStore = signalStore(
 ```
 
 ```typescript
-import { clearUndoRedo } from '@angular-architects/ngrx-toolkit';
+import { clearUndoRedo } from '@ngrx-toolkit/core';
 
 @Component(...)
 public class UndoRedoComponent {

@@ -3,7 +3,7 @@ title: withCallState()
 ---
 
 ```typescript
-import { withCallState } from '@angular-architects/ngrx-toolkit';
+import { withCallState } from '@ngrx-toolkit/core';
 ```
 
 `withCallState` adds call state management capabilities to NgRx signal stores, tracking the status of asynchronous operations with built-in states for loading, loaded, and error conditions.
@@ -43,7 +43,7 @@ The call state can be one of these types:
 ## Usage
 
 ```typescript
-import { withCallState, setLoading, setLoaded, setError } from '@angular-architects/ngrx-toolkit';
+import { withCallState, setLoading, setLoaded, setError } from '@ngrx-toolkit/core';
 
 const store = signalStore(
   withCallState(),
