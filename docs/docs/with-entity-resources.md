@@ -6,8 +6,6 @@ title: withEntityResources()
 import { withEntityResources } from '@angular-architects/ngrx-toolkit';
 ```
 
-> **⚠️ Important Note**: We have found some issues with `hasValue()` not narrowing correctly. If you have any insights or want to follow developments, please refer to our issue: ["bug(withResource and Mutations): hasValue() does not narrow the respective value signal #235"](https://github.com/angular-architects/ngrx-toolkit/issues/235)
-
 `withEntityResources()` integrates Angular Resources that return arrays into NgRx SignalStore using the Entity helpers from `@ngrx/signals/entities`.
 
 > Note: This feature builds on [withResource()](./with-resource.md) and adds an entity view over array resources.

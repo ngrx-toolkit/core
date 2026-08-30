@@ -14,7 +14,7 @@ import {
   withState,
 } from '@ngrx/signals';
 import { of } from 'rxjs';
-import { Assert, AssertNot, IsEqual, Satisfies } from './test-utils/types';
+import { Assert, IsEqual, Satisfies } from './test-utils/types';
 import { ErrorHandling, mapToResource, withResource } from './with-resource';
 import { Address, venice, vienna } from './with-resource/tests/util/fixtures';
 import { paramsForResourceTypes } from './with-resource/tests/util/params-for-resource-types';
@@ -394,7 +394,7 @@ describe('withResource', () => {
         }
       });
 
-      it('fails on hasValue as type predicate when not explicitly typed', () => {
+      it('removes undefined from the inferred value type after hasValue', () => {
         const Store = signalStore(
           { providedIn: 'root' },
           withResource(() => resource({ loader: () => Promise.resolve(1) })),
@@ -402,7 +402,7 @@ describe('withResource', () => {
         const store = TestBed.inject(Store);
         if (store.hasValue()) {
           const _value = store.value();
-          type _T1 = AssertNot<IsEqual<typeof _value, number>>;
+          type _T1 = Assert<IsEqual<typeof _value, number>>;
         }
       });
     });
@@ -449,7 +449,7 @@ describe('withResource', () => {
         }
       });
 
-      it('fails on hasValue as type predicate when not explicitly typed', () => {
+      it('removes undefined from the inferred value type after hasValue', () => {
         const Store = signalStore(
           { providedIn: 'root' },
           withResource(() => resource({ loader: () => Promise.resolve(1) }), {
@@ -459,9 +459,174 @@ describe('withResource', () => {
         const store = TestBed.inject(Store);
         if (store.hasValue()) {
           const _value = store.value();
-          type _T1 = AssertNot<IsEqual<typeof _value, number>>;
+          type _T1 = Assert<IsEqual<typeof _value, number>>;
         }
       });
+
+      it('removes undefined from the inferred value type after hasValue for named resources (no defaults)', () => {
+        const StoreNativeError = signalStore(
+          { providedIn: 'root' },
+          withResource(
+            () => {
+              return {
+                thing: resource({
+                  loader: () => Promise.resolve(1),
+                }),
+              };
+            },
+            {
+              errorHandling: 'native',
+            },
+          ),
+        );
+        const store = TestBed.inject(StoreNativeError);
+
+        const _valueNative = store.thingValue();
+        type _TNative = Assert<
+          IsEqual<typeof _valueNative, number | undefined>
+        >;
+
+        if (store.thingHasValue()) {
+          const _value = store.thingValue();
+          type _T1 = Assert<IsEqual<typeof _value, number>>;
+        }
+
+        const StorePreviousValue = signalStore(
+          { providedIn: 'root' },
+          withResource(
+            () => {
+              return {
+                thing: resource({
+                  loader: () => Promise.resolve(1),
+                }),
+              };
+            },
+            {
+              errorHandling: 'previous value',
+            },
+          ),
+        );
+        const storePreviousValue = TestBed.inject(StorePreviousValue);
+
+        const _valuePrevious = storePreviousValue.thingValue();
+        type _TPrev = Assert<
+          IsEqual<typeof _valuePrevious, number | undefined>
+        >;
+
+        if (storePreviousValue.thingHasValue()) {
+          const _value = storePreviousValue.thingValue();
+          type _T1 = Assert<IsEqual<typeof _value, number>>;
+        }
+
+        const StoreUndefinedValue = signalStore(
+          { providedIn: 'root' },
+          withResource(
+            () => {
+              return {
+                thing: resource({
+                  loader: () => Promise.resolve(1),
+                }),
+              };
+            },
+            {
+              errorHandling: 'undefined value',
+            },
+          ),
+        );
+        const storeUndefinedValue = TestBed.inject(StoreUndefinedValue);
+
+        const _valueUndefined = storeUndefinedValue.thingValue();
+        type _TUndefined = Assert<
+          IsEqual<typeof _valueUndefined, number | undefined>
+        >;
+
+        if (storeUndefinedValue.thingHasValue()) {
+          const _value = storeUndefinedValue.thingValue();
+          type _T1 = Assert<IsEqual<typeof _value, number>>;
+        }
+      });
+    });
+
+    it('removes undefined from the inferred value type after hasValue for named resources (defaults)', () => {
+      const StoreNativeError = signalStore(
+        { providedIn: 'root' },
+        withResource(
+          () => {
+            return {
+              thing: resource({
+                loader: () => Promise.resolve(1),
+                defaultValue: 0,
+              }),
+            };
+          },
+          {
+            errorHandling: 'native',
+          },
+        ),
+      );
+      const store = TestBed.inject(StoreNativeError);
+
+      const _valueNative = store.thingValue();
+      type _TNative = Assert<IsEqual<typeof _valueNative, number>>;
+
+      if (store.thingHasValue()) {
+        const _value = store.thingValue();
+        type _T1 = Assert<IsEqual<typeof _value, number>>;
+      }
+
+      const StorePreviousValue = signalStore(
+        { providedIn: 'root' },
+        withResource(
+          () => {
+            return {
+              thing: resource({
+                loader: () => Promise.resolve(1),
+                defaultValue: 0,
+              }),
+            };
+          },
+          {
+            errorHandling: 'previous value',
+          },
+        ),
+      );
+      const storePreviousValue = TestBed.inject(StorePreviousValue);
+
+      const _valuePrevious = storePreviousValue.thingValue();
+      type _TPrev = Assert<IsEqual<typeof _valuePrevious, number>>;
+
+      if (storePreviousValue.thingHasValue()) {
+        const _value = storePreviousValue.thingValue();
+        type _T1 = Assert<IsEqual<typeof _value, number>>;
+      }
+
+      const StoreUndefinedValue = signalStore(
+        { providedIn: 'root' },
+        withResource(
+          () => {
+            return {
+              thing: resource({
+                loader: () => Promise.resolve(1),
+                defaultValue: 0,
+              }),
+            };
+          },
+          {
+            errorHandling: 'undefined value',
+          },
+        ),
+      );
+      const storeUndefinedValue = TestBed.inject(StoreUndefinedValue);
+
+      const _valueUndefined = storeUndefinedValue.thingValue();
+      type _TUndefined = Assert<
+        IsEqual<typeof _valueUndefined, number | undefined>
+      >;
+
+      if (storeUndefinedValue.thingHasValue()) {
+        const _value = storeUndefinedValue.thingValue();
+        type _T1 = Assert<IsEqual<typeof _value, number>>;
+      }
     });
 
     describe.each(['previous value', 'native'] as const)(
@@ -506,7 +671,7 @@ describe('withResource', () => {
           }
         });
 
-        it('fails on hasValue as type predicate when not explicitly typed', () => {
+        it('removes undefined from the inferred value type after hasValue', () => {
           const Store = signalStore(
             { providedIn: 'root' },
             withResource(() => resource({ loader: () => Promise.resolve(1) }), {
@@ -516,7 +681,7 @@ describe('withResource', () => {
           const store = TestBed.inject(Store);
           if (store.hasValue()) {
             const _value = store.value();
-            type _T1 = AssertNot<IsEqual<typeof _value, number>>;
+            type _T1 = Assert<IsEqual<typeof _value, number>>;
           }
         });
       },
