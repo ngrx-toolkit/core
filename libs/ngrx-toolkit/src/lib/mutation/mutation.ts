@@ -1,13 +1,13 @@
 import { Signal } from '@angular/core';
 
-export type MutationResult<Result> =
+export type MutationResult<Result, Err = unknown> =
   | {
       status: 'success';
       value: Result;
     }
   | {
       status: 'error';
-      error: unknown;
+      error: Err;
     }
   | {
       status: 'aborted';
@@ -15,12 +15,12 @@ export type MutationResult<Result> =
 
 export type MutationStatus = 'idle' | 'pending' | 'error' | 'success';
 
-export type Mutation<Parameter, Result> = {
-  (params: Parameter): Promise<MutationResult<Result>>;
+export type Mutation<Parameter, Result, Err = unknown> = {
+  (params: Parameter): Promise<MutationResult<Result, Err>>;
   status: Signal<MutationStatus>;
   value: Signal<Result | undefined>;
   isPending: Signal<boolean>;
   isSuccess: Signal<boolean>;
-  error: Signal<unknown>;
-  hasValue(): this is Mutation<Exclude<Parameter, undefined>, Result>;
+  error: Signal<Err | undefined>;
+  hasValue(): this is Mutation<Exclude<Parameter, undefined>, Result, Err>;
 };

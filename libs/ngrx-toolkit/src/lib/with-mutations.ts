@@ -14,7 +14,7 @@ import { Mutation, MutationResult, MutationStatus } from './mutation/mutation';
 
 // NamedMutationMethods below will infer the actual parameter and return types
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MutationsDictionary = Record<string, Mutation<any, any>>;
+type MutationsDictionary = Record<string, Mutation<any, any, any>>;
 
 // withMethods uses Record<string, Function> internally
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
@@ -31,9 +31,10 @@ type NamedMutationProps<T extends MutationsDictionary> = {
 type NamedMutationMethods<T extends MutationsDictionary> = {
   [Prop in keyof T as `${Prop & string}`]: T[Prop] extends Mutation<
     infer P,
-    infer R
+    infer R,
+    infer E
   >
-    ? (params: P) => Promise<MutationResult<R>>
+    ? (params: P) => Promise<MutationResult<R, E>>
     : never;
 };
 

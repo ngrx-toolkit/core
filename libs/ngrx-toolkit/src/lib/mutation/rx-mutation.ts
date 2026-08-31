@@ -13,12 +13,14 @@ import {
 import { concatOp, FlatteningOperator } from '../flattening-operator';
 import { Mutation, MutationResult, MutationStatus } from './mutation';
 
-export type Operation<Parameter, Result> = (param: Parameter) => Result;
+export type Operation<Parameter, Result, Err = unknown> = (
+  param: Parameter,
+) => Result;
 
-export interface RxMutationOptions<Parameter, Result> {
-  operation: Operation<Parameter, Observable<Result>>;
+export interface RxMutationOptions<Parameter, Result, Err = unknown> {
+  operation: Operation<Parameter, Observable<Result>, Observable<Err>>;
   onSuccess?: (result: Result, param: Parameter) => void;
-  onError?: (error: unknown, param: Parameter) => void;
+  onError?: (error: Err, param: Parameter) => void;
   operator?: FlatteningOperator;
   injector?: Injector;
 }
@@ -86,14 +88,14 @@ export interface RxMutationOptions<Parameter, Result> {
  * @param options
  * @returns the actual mutation function along tracking data as properties/methods
  */
-export function rxMutation<Parameter, Result>(
+export function rxMutation<Parameter, Result, Err = unknown>(
   optionsOrOperation:
-    | RxMutationOptions<Parameter, Result>
-    | Operation<Parameter, Observable<Result>>,
-): Mutation<Parameter, Result> {
+    | RxMutationOptions<Parameter, Result, Err>
+    | Operation<Parameter, Observable<Result>, Observable<Err>>,
+): Mutation<Parameter, Result, Err> {
   const inputSubject = new Subject<{
     param: Parameter;
-    resolve: (result: MutationResult<Result>) => void;
+    resolve: (result: MutationResult<Result, Err>) => void;
   }>();
 
   const options =
@@ -106,15 +108,15 @@ export function rxMutation<Parameter, Result>(
   const destroyRef = options.injector?.get(DestroyRef) ?? inject(DestroyRef);
 
   const callCount = signal(0);
-  const errorSignal = signal<unknown>(undefined);
+  const errorSignal = signal<Err | undefined>(undefined);
   const idle = signal(true);
   const isPending = computed(() => callCount() > 0);
   const value = signal<Result | undefined>(undefined);
   const isSuccess = computed(() => !idle() && !isPending() && !errorSignal());
 
   const hasValue = function (
-    this: Mutation<Parameter, Result>,
-  ): this is Mutation<Exclude<Parameter, undefined>, Result> {
+    this: Mutation<Parameter, Result, Err>,
+  ): this is Mutation<Exclude<Parameter, undefined>, Result, Err> {
     return typeof value() !== 'undefined';
   };
 
@@ -147,7 +149,7 @@ export function rxMutation<Parameter, Result>(
               errorSignal.set(undefined);
               value.set(result);
             }),
-            catchError((error: unknown) => {
+            catchError((error: Err) => {
               options.onError?.(error, input.param);
               errorSignal.set(error);
               value.set(undefined);
@@ -165,7 +167,7 @@ export function rxMutation<Parameter, Result>(
               } else if (innerStatus === 'error') {
                 input.resolve({
                   status: 'error',
-                  error: errorSignal(),
+                  error: errorSignal() as Err,
                 });
               } else {
                 input.resolve({
@@ -183,7 +185,7 @@ export function rxMutation<Parameter, Result>(
     .subscribe();
 
   const mutationFn = (param: Parameter) => {
-    return new Promise<MutationResult<Result>>((resolve) => {
+    return new Promise<MutationResult<Result, Err>>((resolve) => {
       if (callCount() > 0 && flatteningOp.exhaustSemantics) {
         resolve({
           status: 'aborted',
@@ -197,7 +199,7 @@ export function rxMutation<Parameter, Result>(
     });
   };
 
-  const mutation = mutationFn as Mutation<Parameter, Result>;
+  const mutation = mutationFn as Mutation<Parameter, Result, Err>;
   mutation.status = status;
   mutation.isPending = isPending;
   mutation.error = errorSignal;

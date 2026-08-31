@@ -573,16 +573,16 @@ describe('withMutations with rxMutation', () => {
 
     // CANNOT...
     // @ts-expect-error should not expose properties, only method call
-    const status = store.increment.status;
+    const _status = store.increment.status;
     // @ts-expect-error should not expose properties, only method call
-    const value = store.increment.value;
+    const _value = store.increment.value;
     // @ts-expect-error should not expose properties, only method call
-    const isPending = store.increment.isPending;
+    const _isPending = store.increment.isPending;
     // @ts-expect-error should not expose properties, only method call
-    const isSuccess = store.increment.isSuccess;
+    const _isSuccess = store.increment.isSuccess;
     // @ts-expect-error should not expose properties, only method call
-    const error = store.increment.error;
+    const _error = store.increment.error;
     // @ts-expect-error should not expose properties, only method call
-    const hasValue = store.increment.hasValue;
+    const _hasValue = store.increment.hasValue;
   });
 });

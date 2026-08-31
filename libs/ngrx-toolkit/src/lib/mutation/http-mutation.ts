@@ -43,15 +43,20 @@ export type HttpMutationRequest = {
     | boolean;
 };
 
-export type HttpMutationOptions<Parameter, Result> = Omit<
-  RxMutationOptions<Parameter, NoInfer<Result>>,
+export type HttpMutationOptions<Parameter, Result, Err = unknown> = Omit<
+  RxMutationOptions<Parameter, NoInfer<Result>, NoInfer<Err>>,
   'operation'
 > & {
   request: (param: Parameter) => HttpMutationRequest;
   parse?: (response: unknown) => Result;
+  parseError?: (error: unknown) => Err;
 };
 
-export type HttpMutation<Parameter, Result> = Mutation<Parameter, Result> & {
+export type HttpMutation<Parameter, Result, Err = unknown> = Mutation<
+  Parameter,
+  Result,
+  Err
+> & {
   uploadProgress: Signal<HttpProgressEvent | undefined>;
   downloadProgress: Signal<HttpProgressEvent | undefined>;
   headers: Signal<HttpHeaders | undefined>;
@@ -110,11 +115,11 @@ export type HttpMutation<Parameter, Result> = Mutation<Parameter, Result> & {
  * @param options The options for the HTTP mutation.
  * @returns The HTTP mutation.
  */
-export function httpMutation<Parameter, Result>(
+export function httpMutation<Parameter, Result, Err = unknown>(
   optionsOrRequest:
-    | HttpMutationOptions<Parameter, Result>
+    | HttpMutationOptions<Parameter, Result, Err>
     | ((param: Parameter) => HttpMutationRequest),
-): HttpMutation<Parameter, Result> {
+): HttpMutation<Parameter, Result, Err> {
   const httpClient = inject(HttpClient);
 
   const options =
@@ -123,6 +128,7 @@ export function httpMutation<Parameter, Result>(
       : optionsOrRequest;
 
   const parse = options.parse ?? ((raw: unknown) => raw as Result);
+  const parseError = options.parseError ?? ((raw: unknown) => raw as Err);
 
   const uploadProgress = signal<HttpProgressEvent | undefined>(undefined);
   const downloadProgress = signal<HttpProgressEvent | undefined>(undefined);
@@ -163,7 +169,7 @@ export function httpMutation<Parameter, Result>(
           );
       });
     },
-  }) as HttpMutation<Parameter, Result>;
+  }) as HttpMutation<Parameter, Result, Err>;
 
   mutation.uploadProgress = uploadProgress;
   mutation.downloadProgress = downloadProgress;

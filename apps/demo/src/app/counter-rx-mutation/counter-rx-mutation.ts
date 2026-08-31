@@ -5,7 +5,7 @@ import {
 } from '@angular-architects/ngrx-toolkit';
 import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
-import { delay, Observable, of, throwError } from 'rxjs';
+import { catchError, delay, Observable, of, throwError } from 'rxjs';
 
 export type Params = {
   value: number;
@@ -51,6 +51,12 @@ export class CounterRxMutation {
     onSuccess: (response) => {
       console.log('Counter sent to server:', response);
     },
+    // TODO - In the current state, parsing for the error does not narrow unless either
+    // - 3rd error type generic specified
+    // - No generic types specified
+    // This is inline with the existing configuration of this `httpMutation` example before this proposed change
+    // If you uncomment the following, you must still specify the error type or drop the explicit types
+    // parseError: (error) => error as string,
     onError: (error) => {
       console.error('Failed to send counter:', error);
     },
@@ -108,5 +114,11 @@ function calcSum(a: number, b: number): Observable<number> {
       result,
     }));
   }
-  return of(result).pipe(delay(500));
+  return of(result).pipe(
+    delay(500),
+    catchError((error) => {
+      console.error('Error in calcSum:', error);
+      return of(1);
+    }),
+  );
 }
