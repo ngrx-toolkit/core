@@ -64,17 +64,17 @@ export const lazyRoutes: Route[] = [
       ),
   },
   {
-    path: 'mutation',
+    path: 'mutation-store',
     loadComponent: () =>
-      import('./counter-mutation/counter-mutation').then(
-        (m) => m.CounterMutation,
+      import('./counter-mutation-store/counter-mutation-store').then(
+        (m) => m.CounterMutationStore,
       ),
   },
   {
-    path: 'rx-mutation',
+    path: 'mutation-functions',
     loadComponent: () =>
-      import('./counter-rx-mutation/counter-rx-mutation').then(
-        (m) => m.CounterRxMutation,
+      import('./counter-mutation-functions/counter-mutation-functions').then(
+        (m) => m.CounterRxMutationFunctions,
       ),
   },
   {

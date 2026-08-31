@@ -20,7 +20,7 @@
   font-size: 0.9rem;
 }
 
-.section {
+section {
   margin: 2rem 0;
   padding: 1.5rem;
   border: 1px solid #e0e0e0;
@@ -28,7 +28,7 @@
   background-color: #fafafa;
 }
 
-.section h2 {
+section h2 {
   margin-top: 0;
   color: #333;
   border-bottom: 2px solid #007acc;

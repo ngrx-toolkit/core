@@ -2,7 +2,7 @@
 
 <div class="counter">{{ counter() }}</div>
 
-<div class="section">
+<section>
   <h2>Local Increment</h2>
   <ul>
     <li>isPending: {{ isPending() }}</li>
@@ -11,13 +11,13 @@
   </ul>
 
   <div>
-    <button (click)="increment()" [disabled]="isPending()">
+    <button type="button" (click)="increment()" [disabled]="isPending()">
       @if (isPending()) { Incrementing... } @else { Increment }
     </button>
   </div>
-</div>
+</section>
 
-<div class="section">
+<section>
   <h2>Sending to Server</h2>
 
   <ul>
@@ -28,8 +28,8 @@
   </ul>
 
   <div>
-    <button (click)="saveToServer()" [disabled]="saveIsPending()">
+    <button type="button" (click)="saveToServer()" [disabled]="saveIsPending()">
       @if (saveIsPending()) { Sending to Server... } @else { Sending to Server }
     </button>
   </div>
-</div>
+</section>

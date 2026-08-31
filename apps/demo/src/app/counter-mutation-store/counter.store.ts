@@ -36,14 +36,13 @@ export const CounterStore = signalStore(
         console.error('Error occurred:', error);
       },
     }),
-    saveToServer: httpMutation<void, CounterResponse>({
-      request: () => ({
+    saveToServer: httpMutation({
+      request: (_: void) => ({
         url: `https://httpbin.org/post`,
         method: 'POST',
         body: { counter: store.counter() },
-        headers: { 'Content-Type': 'application/json' },
       }),
-      onSuccess: (response) => {
+      onSuccess: (response: CounterResponse) => {
         console.log('Counter sent to server:', response);
         patchState(store, { lastResponse: response.json });
       },
@@ -54,24 +53,26 @@ export const CounterStore = signalStore(
   })),
 );
 
+// For demo purposes, helps ensures we fail on the first time we hit 7 or 13
 let error = false;
 
-function createSumObservable(a: number, b: number): Observable<number> {
-  return new Observable<number>((subscriber) => {
-    const result = a + b;
-
-    if ((result === 7 || result === 13) && !error) {
-      subscriber.error({ message: 'error due to bad luck!', result });
-      error = true;
-    } else {
-      subscriber.next(result);
-      error = false;
-    }
-    subscriber.complete();
-  });
-}
-
+/**
+ * @description return of(a + b)
+ */
 function calcSum(a: number, b: number): Observable<number> {
-  // return of(a + b);
+  function createSumObservable(a: number, b: number): Observable<number> {
+    return new Observable<number>((subscriber) => {
+      const result = a + b;
+
+      if ((result === 7 || result === 13) && !error) {
+        subscriber.error({ message: 'error due to bad luck!', result });
+        error = true;
+      } else {
+        subscriber.next(result);
+        error = false;
+      }
+      subscriber.complete();
+    });
+  }
   return createSumObservable(a, b).pipe(delay(500));
 }

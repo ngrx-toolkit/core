@@ -1,14 +1,14 @@
-import { CommonModule } from '@angular/common';
+import { JsonPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { CounterStore } from './counter.store';
 
 @Component({
-  selector: 'demo-counter-mutation',
-  imports: [CommonModule],
-  templateUrl: './counter-mutation.html',
-  styleUrl: './counter-mutation.css',
+  selector: 'demo-counter-mutation-store',
+  imports: [JsonPipe],
+  templateUrl: './counter-mutation-store.html',
+  styleUrl: './counter-mutation-store.css',
 })
-export class CounterMutation {
+export class CounterMutationStore {
   private store = inject(CounterStore);
 
   protected counter = this.store.counter;

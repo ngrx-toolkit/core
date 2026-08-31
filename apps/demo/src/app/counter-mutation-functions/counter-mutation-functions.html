@@ -2,7 +2,7 @@
 
 <div class="counter">{{ counter() }}</div>
 
-<div class="section">
+<section>
   <h2>Local Increment (rxMutation)</h2>
   <ul>
     <li>isPending: {{ isPending() }}</li>
@@ -13,16 +13,16 @@
   </ul>
 
   <div>
-    <button (click)="incrementCounter()" [disabled]="isPending()">
+    <button type="button" (click)="incrementCounter()" [disabled]="isPending()">
       @if (isPending()) { Incrementing... } @else { Increment by 1 }
     </button>
-    <button (click)="incrementBy13()" [disabled]="isPending()">
+    <button type="button" (click)="incrementBy13()" [disabled]="isPending()">
       @if (isPending()) { Incrementing... } @else { Increment by 13 }
     </button>
   </div>
-</div>
+</section>
 
-<div class="section">
+<section>
   <h2>Send to Server (httpMutation)</h2>
 
   <ul>
@@ -33,8 +33,12 @@
   </ul>
 
   <div>
-    <button (click)="saveCounterToServer()" [disabled]="saveIsPending()">
+    <button
+      type="button"
+      (click)="saveCounterToServer()"
+      [disabled]="saveIsPending()"
+    >
       @if (saveIsPending()) { Sending to Server... } @else { Send to Server }
     </button>
   </div>
-</div>
+</section>
