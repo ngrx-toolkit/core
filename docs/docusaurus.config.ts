@@ -114,7 +114,7 @@ const config: Config = {
     },
     footer: {
       style: 'dark',
-      copyright: `Copyright © ${new Date().getFullYear()} Community & Angular Architects`,
+      copyright: `Copyright © ${new Date().getFullYear()} NgRx Toolkit contributors`,
     },
     prism: {
       theme: prismThemes.github,
