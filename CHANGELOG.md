@@ -1,3 +1,22 @@
+# 22.0.0 (2026-08-31)
+
+### 🚀 Features
+
+- **devtools:** add `Action`.as parameter of `updateState` ([aceb534](https://github.com/rainerhahnekamp/ngrx-toolkit/commit/aceb534))
+
+### 🩹 Fixes
+
+- narrow `NamedMutationMethods` to just fn signature ([#305](https://github.com/rainerhahnekamp/ngrx-toolkit/pull/305))
+- **mutations:** allow defining the response type ([#309](https://github.com/rainerhahnekamp/ngrx-toolkit/pull/309), [#310](https://github.com/rainerhahnekamp/ngrx-toolkit/pull/310))
+- **with-resource:** preserve hasValue narrowing ([#315](https://github.com/rainerhahnekamp/ngrx-toolkit/pull/315))
+
+### ❤️ Thank You
+
+- Michael Small @michael-small
+- Oleh Biblyi @OlegSuncrown
+- Rainer Hahnekamp @rainerhahnekamp
+- Serhii Siryk @sqrter
+
 ## 19.1.0 (2025-02-12)
 
 ### 🚀 Features
