@@ -52,8 +52,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/ngrx-toolkit/ngrx-toolkit/tree/main/docs/',
+          editUrl: 'https://github.com/ngrx-toolkit/core/tree/main/docs/',
         },
         blog: false,
         theme: {
@@ -101,7 +100,7 @@ const config: Config = {
           label: 'Community',
         },
         {
-          href: 'https://github.com/ngrx-toolkit/ngrx-toolkit',
+          href: 'https://github.com/ngrx-toolkit/core',
           label: 'GitHub',
           position: 'right',
         },

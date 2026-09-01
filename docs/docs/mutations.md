@@ -34,7 +34,7 @@ This guide covers
   - State signals available (`value/status/error/isPending`)
       <!-- TODO - resolve when #235 closed-->
     - For `httpMutation`, the response type is specified with the param `parse: (res: T) => res as T`
-    - `hasValue` signal to narrow type. ⚠️NOTE⚠️: currently there is an [outstanding bug](https://github.com/ngrx-toolkit/ngrx-toolkit/issues/235) that this does not properly narrow.
+    - `hasValue` signal to narrow type. ⚠️NOTE⚠️: currently there is an [outstanding bug](https://github.com/ngrx-toolkit/core/issues/235) that this does not properly narrow.
   - [How to use](#usage-withmutations-or-solo-functions), as:
     - _standalone functions_
     - In `withMutations` store _feature_
