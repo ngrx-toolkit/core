@@ -3,7 +3,7 @@ title: withDataService()
 ---
 
 ```typescript
-import { withDataService } from '@angular-architects/ngrx-toolkit';
+import { withDataService } from '@ngrx-toolkit/core';
 ```
 
 `withDataService()` allows to connect a Data Service to the store:
@@ -11,7 +11,7 @@ import { withDataService } from '@angular-architects/ngrx-toolkit';
 This gives you a store for a CRUD use case:
 
 ```typescript
-import { withDataService, withCallState, withUndoRedo } from '@angular-architects/ngrx-toolkit';
+import { withDataService, withCallState, withUndoRedo } from '@ngrx-toolkit/core';
 
 export const SimpleFlightBookingStore = signalStore(
   { providedIn: 'root' },
@@ -92,7 +92,7 @@ export class FlightSearchSimpleComponent {
 To avoid naming conflicts, the properties set up by `withDataService` and the connected features can be configured in a typesafe way:
 
 ```typescript
-import { withDataService, withCallState, withUndoRedo } from '@angular-architects/ngrx-toolkit';
+import { withDataService, withCallState, withUndoRedo } from '@ngrx-toolkit/core';
 
 export const FlightBookingStore = signalStore(
   { providedIn: 'root' },

@@ -3,7 +3,7 @@ title: withResource()
 ---
 
 ```typescript
-import { withResource } from '@angular-architects/ngrx-toolkit';
+import { withResource } from '@ngrx-toolkit/core';
 ```
 
 > **⚠️ Important Note**: This extension is very likely to land in NgRx once Angular's `Resource` enters developer preview. The `withResource` extension provides early access to this functionality and will be maintained for compatibility until the official NgRx implementation is available.
@@ -36,7 +36,7 @@ The extension supports both single resource integration and multiple named resou
 ### Single Resource
 
 ```typescript
-import { withResource } from '@angular-architects/ngrx-toolkit';
+import { withResource } from '@ngrx-toolkit/core';
 import { signalStore, withState } from '@ngrx/signals';
 import { httpResource } from '@angular/core';
 
@@ -127,7 +127,7 @@ Options:
 1. `'previous value'`. The resource's previous value will be returned.
 1. `'native'`. No special handling is provided, inline with default error behavior.
 
-Under the hood, `'previous value'` and `'undefined value'` proxy the value. For a detailed explanation for why this is done, check out the [JSDoc for the error handling strategy](https://github.com/angular-architects/ngrx-toolkit/blob/main/libs/ngrx-toolkit/src/lib/with-resource.ts#L402).
+Under the hood, `'previous value'` and `'undefined value'` proxy the value. For a detailed explanation for why this is done, check out the [JSDoc for the error handling strategy](https://github.com/ngrx-toolkit/ngrx-toolkit/blob/main/libs/ngrx-toolkit/src/lib/with-resource.ts#L402).
 
 The implications of `undefined value` is that the inferred value can be `undefined`, even if there is a `defaultValue` set for the resource.
 For example, in the [`Updating`](#updating) section, `listValue` will be inferred as `User[] | undefined`. To be able to infer the type with a guaranteed value,
@@ -159,7 +159,7 @@ export class UserDetail {
 For named resources, you can use the `mapToResource` utility to get a properly typed `Resource<T>`:
 
 ```typescript
-import { mapToResource } from '@angular-architects/ngrx-toolkit';
+import { mapToResource } from '@ngrx-toolkit/core';
 
 const store = signalStore(
   withState({ userId: undefined as number | undefined }),

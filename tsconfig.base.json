@@ -15,8 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@angular-architects/ngrx-toolkit": ["libs/ngrx-toolkit/src/index.ts"],
-      "@angular-architects/ngrx-toolkit/redux-connector": [
+      "@ngrx-toolkit/core": ["libs/ngrx-toolkit/src/index.ts"],
+      "@ngrx-toolkit/core/redux-connector": [
         "libs/ngrx-toolkit/redux-connector"
       ]
     },

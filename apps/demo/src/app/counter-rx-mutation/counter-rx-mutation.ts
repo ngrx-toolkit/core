@@ -1,10 +1,6 @@
-import {
-  concatOp,
-  httpMutation,
-  rxMutation,
-} from '@angular-architects/ngrx-toolkit';
 import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
+import { concatOp, httpMutation, rxMutation } from '@ngrx-toolkit/core';
 import { delay, Observable, of, throwError } from 'rxjs';
 
 export type Params = {

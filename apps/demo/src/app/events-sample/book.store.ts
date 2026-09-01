@@ -2,7 +2,7 @@ import {
   withDevtools,
   withGlitchTracking,
   withTrackedReducer,
-} from '@angular-architects/ngrx-toolkit';
+} from '@ngrx-toolkit/core';
 import { signalStore, withComputed, withHooks, withState } from '@ngrx/signals';
 import { injectDispatch, on } from '@ngrx/signals/events';
 import { bookEvents } from './book-events';

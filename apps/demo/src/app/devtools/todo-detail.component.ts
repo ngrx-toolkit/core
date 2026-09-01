@@ -1,11 +1,11 @@
+import { Component, effect, inject, input } from '@angular/core';
+import { MatCardModule } from '@angular/material/card';
 import {
   renameDevtoolsName,
   withDevtools,
   withGlitchTracking,
   withMapper,
-} from '@angular-architects/ngrx-toolkit';
-import { Component, effect, inject, input } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
+} from '@ngrx-toolkit/core';
 import { patchState, signalStore, withHooks, withState } from '@ngrx/signals';
 import { Todo } from '../shared/todo.service';
 

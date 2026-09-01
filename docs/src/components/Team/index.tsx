@@ -16,7 +16,7 @@ const teamMembers: TeamMember[] = [
   { 
     name: 'Rainer Hahnekamp', 
     image: '/img/team/rainer-hahnekamp.jpg',
-    description: 'Google Developer Expert (GDE) and a member of the NgRx team. Trainer and consultant in the Angular Architects expert network and runs ng-news, a weekly Angular newsletter.'
+    description: 'Google Developer Expert (GDE) and member of the NgRx team, focused on Angular, AI engineering, and agentic applications. Runs ng-news, a weekly Angular newsletter.'
   },
   { 
     name: 'Michael Small', 

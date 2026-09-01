@@ -10,14 +10,14 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://angular-architects.github.io',
+  url: 'https://ngrx-toolkit.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'angular-architects', // Usually your GitHub org/user name.
+  organizationName: 'ngrx-toolkit', // Usually your GitHub org/user name.
   projectName: 'ngrx-toolkit', // Usually your repo name.
   deploymentBranch: 'main',
   onBrokenLinks: 'throw',
@@ -53,7 +53,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/angular-architects/ngrx-toolkit/tree/main/docs/',
+            'https://github.com/ngrx-toolkit/ngrx-toolkit/tree/main/docs/',
         },
         blog: false,
         theme: {
@@ -101,7 +101,7 @@ const config: Config = {
           label: 'Community',
         },
         {
-          href: 'https://github.com/angular-architects/ngrx-toolkit',
+          href: 'https://github.com/ngrx-toolkit/ngrx-toolkit',
           label: 'GitHub',
           position: 'right',
         },
@@ -114,7 +114,7 @@ const config: Config = {
     },
     footer: {
       style: 'dark',
-      copyright: `Copyright © ${new Date().getFullYear()} Community & Angular Architects`,
+      copyright: `Copyright © ${new Date().getFullYear()} NgRx Toolkit contributors`,
     },
     prism: {
       theme: prismThemes.github,

@@ -1,7 +1,7 @@
-import { withResource } from '@angular-architects/ngrx-toolkit';
 import { JsonPipe } from '@angular/common';
 import { httpResource } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
+import { withResource } from '@ngrx-toolkit/core';
 import { signalStore, withState } from '@ngrx/signals';
 import { Flight } from '../shared/flight';
 

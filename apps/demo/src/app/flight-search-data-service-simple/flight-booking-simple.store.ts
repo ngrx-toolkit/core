@@ -6,7 +6,7 @@ import {
   withCallState,
   withDataService,
   withUndoRedo,
-} from '@angular-architects/ngrx-toolkit';
+} from '@ngrx-toolkit/core';
 import { withEntities } from '@ngrx/signals/entities';
 import { Flight } from '../shared/flight';
 

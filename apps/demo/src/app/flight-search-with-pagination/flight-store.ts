@@ -4,7 +4,7 @@ import {
   withCallState,
   withDataService,
   withPagination,
-} from '@angular-architects/ngrx-toolkit';
+} from '@ngrx-toolkit/core';
 import { patchState, signalStore, type, withMethods } from '@ngrx/signals';
 import { withEntities } from '@ngrx/signals/entities';
 import { Flight } from '../shared/flight';

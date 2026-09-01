@@ -3,7 +3,7 @@ title: withImmutableState()
 ---
 
 ```typescript
-import { withImmutableState } from '@angular-architects/ngrx-toolkit';
+import { withImmutableState } from '@ngrx-toolkit/core';
 ```
 
 `withImmutableState` acts like `withState` but protects
@@ -14,7 +14,7 @@ The protection is not limited to changes within the
 SignalStore but also outside of it.
 
 ```typescript
-import { withImmutableState } from '@angular-architects/ngrx-toolkit';
+import { withImmutableState } from '@ngrx-toolkit/core';
 
 const initialState = { user: { id: 1, name: 'Konrad' } };
 
@@ -68,7 +68,7 @@ By default, `withImmutableState` is only active in development mode.
 There is a way to enable it in production mode as well:
 
 ```typescript
-import { withImmutableState } from '@angular-architects/ngrx-toolkit';
+import { withImmutableState } from '@ngrx-toolkit/core';
 
 const UserStore = signalStore({ providedIn: 'root' }, withImmutableState(initialState, { enableInProduction: true }));
 ```

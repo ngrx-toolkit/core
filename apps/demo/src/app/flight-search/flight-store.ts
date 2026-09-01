@@ -1,12 +1,12 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { inject } from '@angular/core';
 import {
   noPayload,
   payload,
   updateState,
   withDevtools,
   withRedux,
-} from '@angular-architects/ngrx-toolkit';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject } from '@angular/core';
+} from '@ngrx-toolkit/core';
 import { signalStore, withState } from '@ngrx/signals';
 import { map, switchMap } from 'rxjs';
 import { Flight } from './flight';

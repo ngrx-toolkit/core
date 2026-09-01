@@ -1,8 +1,5 @@
-import {
-  withIndexedDB,
-  withStorageSync,
-} from '@angular-architects/ngrx-toolkit';
 import { inject } from '@angular/core';
+import { withIndexedDB, withStorageSync } from '@ngrx-toolkit/core';
 import { getState, patchState, signalStore, withMethods } from '@ngrx/signals';
 import {
   removeEntity,

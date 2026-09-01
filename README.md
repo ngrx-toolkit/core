@@ -1,8 +1,8 @@
 # NgRx Toolkit
 
-[![npm](https://img.shields.io/npm/v/%40angular-architects%2Fngrx-toolkit.svg)](https://www.npmjs.com/package/%40angular-architects%2Fngrx-toolkit)
+[![npm](https://img.shields.io/npm/v/%40ngrx-toolkit%2Fcore.svg)](https://www.npmjs.com/package/%40ngrx-toolkit%2Fcore)
 
-<a href="https://angular-architects.github.io/ngrx-toolkit/"><img src="https://raw.githubusercontent.com/angular-architects/ngrx-toolkit/main/logo.png" width="320" style="text-align: center" /></a>
+<a href="https://ngrx-toolkit.github.io/ngrx-toolkit/"><img src="https://raw.githubusercontent.com/ngrx-toolkit/ngrx-toolkit/main/logo.png" width="320" style="text-align: center" /></a>
 
 NgRx Toolkit is a set of extensions to the NgRx Signals Store, like
 
@@ -11,10 +11,12 @@ NgRx Toolkit is a set of extensions to the NgRx Signals Store, like
 - Storage Sync: Synchronize the Store with Web Storage
 - [Redux Connector: Map NgRx Store Actions to a present Signal Store](libs/ngrx-toolkit/redux-connector/docs/README.md)
 
+> Starting with v22, the package is published as `@ngrx-toolkit/core`. For v21 and earlier, use `@angular-architects/ngrx-toolkit`.
+
 To install it, run
 
 ```shell
-npm i @angular-architects/ngrx-toolkit
+npm i @ngrx-toolkit/core
 ```
 
 For a more detailed guide on installation, setup, and usage, head to the [**Documentation**](https://ngrx-toolkit.angulararchitects.io/).

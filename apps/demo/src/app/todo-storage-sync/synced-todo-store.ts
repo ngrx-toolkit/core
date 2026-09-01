@@ -1,8 +1,5 @@
-import {
-  withLocalStorage,
-  withStorageSync,
-} from '@angular-architects/ngrx-toolkit';
 import { inject } from '@angular/core';
+import { withLocalStorage, withStorageSync } from '@ngrx-toolkit/core';
 import { getState, patchState, signalStore, withMethods } from '@ngrx/signals';
 import {
   removeEntity,

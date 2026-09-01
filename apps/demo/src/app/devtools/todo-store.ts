@@ -1,5 +1,5 @@
-import { updateState, withDevtools } from '@angular-architects/ngrx-toolkit';
 import { computed, inject } from '@angular/core';
+import { updateState, withDevtools } from '@ngrx-toolkit/core';
 import {
   signalStore,
   withComputed,

@@ -4,6 +4,12 @@ title: Extensions
 
 The NgRx Toolkit is a set of extensions to the NgRx SignalsStore.
 
+:::note Package name for v22
+
+Starting with v22, install and import the toolkit as `@ngrx-toolkit/core`. For v21 and earlier, use `@angular-architects/ngrx-toolkit`.
+
+:::
+
 It offers extensions like:
 
 - [⭐️ Devtools](./with-devtools): Integration into Redux Devtools
@@ -22,5 +28,5 @@ It offers extensions like:
 To install it, run
 
 ```shell
-npm i @angular-architects/ngrx-toolkit
+npm i @ngrx-toolkit/core
 ```

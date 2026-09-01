@@ -3,7 +3,7 @@ import {
   httpMutation,
   rxMutation,
   withMutations,
-} from '@angular-architects/ngrx-toolkit';
+} from '@ngrx-toolkit/core';
 import { patchState, signalStore, withState } from '@ngrx/signals';
 import { delay, Observable } from 'rxjs';
 

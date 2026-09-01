@@ -3,7 +3,7 @@ title: withDevtools()
 ---
 
 ```typescript
-import { withDevtools } from '@angular-architects/ngrx-toolkit';
+import { withDevtools } from '@ngrx-toolkit/core';
 ```
 
 :::info
@@ -15,7 +15,7 @@ Redux Devtools is a powerful browser extension tool, that allows you to inspect 
 To use the Devtools, you need to add the `withDevtools()` extension to your SignalStore:
 
 ```typescript
-import { withDevtools } from '@angular-architects/ngrx-toolkit';
+import { withDevtools } from '@ngrx-toolkit/core';
 
 export const FlightStore = signalStore(
   { providedIn: 'root' },
@@ -27,7 +27,7 @@ export const FlightStore = signalStore(
 
 After that, open your app and navigate to the component that uses the store. Open the Devtools and you will see the `flights` store in the Devtools under the name "NgRx Signal Store"
 
-You can find a working example in the [demo app](https://github.com/angular-architects/ngrx-toolkit/blob/main/apps/demo/src/app/devtools/todo-store.ts).
+You can find a working example in the [demo app](https://github.com/ngrx-toolkit/ngrx-toolkit/blob/main/apps/demo/src/app/devtools/todo-store.ts).
 
 :::info
 The extensions don't activate during app initialization (as it is with `@ngrx/store`). You need to open the Devtools and select the "NgRx Signal Store" tab to activate them.
@@ -38,13 +38,13 @@ The extensions don't activate during app initialization (as it is with `@ngrx/st
 ## `updateState()` vs `patchState()`
 
 ```typescript
-import { updateState } from '@angular-architects/ngrx-toolkit';
+import { updateState } from '@ngrx-toolkit/core';
 ```
 
 The Signal Store does not use the Redux pattern, so there are no action names involved by default. Instead, every action is referred to as a "Store Update". If you want to customize the action name for better clarity, you can use the `updateState()` function instead of `patchState()`:
 
 ```typescript
-import { updateState } from '@angular-architects/ngrx-toolkit';
+import { updateState } from '@ngrx-toolkit/core';
 
 patchState(this.store, { loading: false });
 
@@ -55,7 +55,7 @@ updateState(this.store, 'update loading', { loading: false });
 ## `renameDevtoolsName()`
 
 ```typescript
-import { renameDevtoolsName } from '@angular-architects/ngrx-toolkit';
+import { renameDevtoolsName } from '@ngrx-toolkit/core';
 ```
 
 If multiple instances of a given SignalStore exist, the Devtools will index the names. For example, if you have two `TodoDetail` instances with the name `todo-detail`, the first one will be named `todo-detail` and the second one `todo-detail-1`.
@@ -65,7 +65,7 @@ At any time, you can use `renameDevtoolsName()` to change the name of the store 
 The following example shows a component, which has a locally provided store and renames it according to the `id` of the `todo` Signal.
 
 ```typescript
-import { renameDevtoolsName, withDevtools } from '@angular-architects/ngrx-toolkit';
+import { renameDevtoolsName, withDevtools } from '@ngrx-toolkit/core';
 
 const TodoDetailStore = signalStore(withDevtools('todo-detail'), withState({ id: 1 }));
 
@@ -88,7 +88,7 @@ export class TodoDetailComponent {
 ## `withGlitchTracking()`
 
 ```typescript
-import { withGlitchTracking } from '@angular-architects/ngrx-toolkit';
+import { withGlitchTracking } from '@ngrx-toolkit/core';
 ```
 
 It tracks all state changes of the State, including intermediary updates
@@ -99,7 +99,7 @@ This feature is especially useful for debugging.
 Example:
 
 ```typescript
-import { withGlitchTracking, withDevtools } from '@angular-architects/ngrx-toolkit';
+import { withGlitchTracking, withDevtools } from '@ngrx-toolkit/core';
 
 const Store = signalStore(
   { providedIn: 'root' },
@@ -125,7 +125,7 @@ It is also possible to mix. So one store could have `withGlitchTracking()` and a
 ## `withDisabledNameIndices()`
 
 ```typescript
-import { withDisabledNameIndices } from '@angular-architects/ngrx-toolkit';
+import { withDisabledNameIndices } from '@ngrx-toolkit/core';
 ```
 
 `withDevtools()` foresees the possibility to add features which extend or modify it. At the moment, `withDisabledNameIndices()` is the only feature available. It disables the automatic indexing of the store names in the Devtools.
@@ -135,7 +135,7 @@ If multiple instances exist at the same time, `withDisabledNameIndices()` will t
 You activate per store:
 
 ```typescript
-import { withDisabledNameIndices, withDevtools } from '@angular-architects/ngrx-toolkit';
+import { withDisabledNameIndices, withDevtools } from '@ngrx-toolkit/core';
 
 const Store = signalStore({ providedIn: 'root' }, withDevtools('flights', withDisabledNameIndices()), withState({ airline: 'Lufthansa' }));
 ```
@@ -143,7 +143,7 @@ const Store = signalStore({ providedIn: 'root' }, withDevtools('flights', withDi
 ## `withMapper()`
 
 ```typescript
-import { withMapper } from '@angular-architects/ngrx-toolkit';
+import { withMapper } from '@ngrx-toolkit/core';
 ```
 
 `withMapper()` allows you to define a function that maps the state before it is sent to the Devtools.
@@ -151,7 +151,7 @@ import { withMapper } from '@angular-architects/ngrx-toolkit';
 Sometimes, it is necessary to map the state before it is sent to the Devtools. For example, you might want to exclude some properties, like passwords or other sensitive data.
 
 ```typescript
-import { withMapper, withDevtools } from '@angular-architects/ngrx-toolkit';
+import { withMapper, withDevtools } from '@ngrx-toolkit/core';
 
 const initialState = {
   id: 1,
@@ -182,7 +182,7 @@ To use it
 
 ```ts
 // Must have all three, or runtime errors for thee!
-import { withTrackedReducer, withGlitchTracking, withDevtools } from '@angular-architects/ngrx-toolkit';
+import { withTrackedReducer, withGlitchTracking, withDevtools } from '@ngrx-toolkit/core';
 
 export const bookEvents = eventGroup({
   source: 'Book Store',
@@ -225,7 +225,7 @@ It is required to add the `withDevtools()` function to the environment files.
 environments/environment.ts:
 
 ```typescript
-import { withDevtools } from '@angular-architects/ngrx-toolkit';
+import { withDevtools } from '@ngrx-toolkit/core';
 
 export const environment = {
   storeWithDevTools: withDevtools,
@@ -235,7 +235,7 @@ export const environment = {
 environments/environment.prod.ts
 
 ```typescript
-import { withDevtoolsStub } from '@angular-architects/ngrx-toolkit';
+import { withDevtoolsStub } from '@ngrx-toolkit/core';
 
 export const environment = {
   storeWithDevTools: withDevToolsStub,

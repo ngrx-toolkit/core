@@ -1,7 +1,7 @@
-import { withFeatureFactory } from '@angular-architects/ngrx-toolkit';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
+import { withFeatureFactory } from '@ngrx-toolkit/core';
 import {
   patchState,
   signalStore,
