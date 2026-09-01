@@ -127,7 +127,7 @@ Options:
 1. `'previous value'`. The resource's previous value will be returned.
 1. `'native'`. No special handling is provided, inline with default error behavior.
 
-Under the hood, `'previous value'` and `'undefined value'` proxy the value. For a detailed explanation for why this is done, check out the [JSDoc for the error handling strategy](https://github.com/ngrx-toolkit/ngrx-toolkit/blob/main/libs/ngrx-toolkit/src/lib/with-resource.ts#L402).
+Under the hood, `'previous value'` and `'undefined value'` proxy the value. For a detailed explanation for why this is done, check out the [JSDoc for the error handling strategy](https://github.com/ngrx-toolkit/core/blob/main/libs/ngrx-toolkit/src/lib/with-resource.ts#L402).
 
 The implications of `undefined value` is that the inferred value can be `undefined`, even if there is a `defaultValue` set for the resource.
 For example, in the [`Updating`](#updating) section, `listValue` will be inferred as `User[] | undefined`. To be able to infer the type with a guaranteed value,

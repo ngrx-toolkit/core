@@ -4,7 +4,7 @@
   "license": "MIT",
   "repository": {
     "type": "GitHub",
-    "url": "https://github.com/ngrx-toolkit/ngrx-toolkit"
+    "url": "https://github.com/ngrx-toolkit/core"
   },
   "publishConfig": {
     "access": "public"

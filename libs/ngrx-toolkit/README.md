@@ -1,6 +1,6 @@
 # NgRx Toolkit
 
-<img src="https://raw.githubusercontent.com/ngrx-toolkit/ngrx-toolkit/main/logo.png" width="320" />
+<img src="https://raw.githubusercontent.com/ngrx-toolkit/core/main/logo.png" width="320" />
 
 NgRx Toolkit is a set of extensions to the NgRx Signals Store, like
 

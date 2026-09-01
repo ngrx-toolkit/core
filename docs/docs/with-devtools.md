@@ -27,7 +27,7 @@ export const FlightStore = signalStore(
 
 After that, open your app and navigate to the component that uses the store. Open the Devtools and you will see the `flights` store in the Devtools under the name "NgRx Signal Store"
 
-You can find a working example in the [demo app](https://github.com/ngrx-toolkit/ngrx-toolkit/blob/main/apps/demo/src/app/devtools/todo-store.ts).
+You can find a working example in the [demo app](https://github.com/ngrx-toolkit/core/blob/main/apps/demo/src/app/devtools/todo-store.ts).
 
 :::info
 The extensions don't activate during app initialization (as it is with `@ngrx/store`). You need to open the Devtools and select the "NgRx Signal Store" tab to activate them.

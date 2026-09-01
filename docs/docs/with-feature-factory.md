@@ -24,5 +24,5 @@ Use `import { withFeature } from '@ngrx/signals'` instead.
 - NgRx PR: ["feat(signals): add `withFeature` #4739"](https://github.com/ngrx/platform/pull/4739)
 - NgRx [documentation section](https://ngrx.io/guide/signals/signal-store/custom-store-features#connecting-a-custom-feature-with-the-store) on `withFeature`
 
-In the future, `withFeatureFactory` will likely be removed, provided a right migration path is prepared. Watch out for PRs, and see [the PR that deprecates `withFeatureFactory` for the initial plan for handling the removal](https://github.com/ngrx-toolkit/ngrx-toolkit/pull/167#pullrequestreview-2735443379).
+In the future, `withFeatureFactory` will likely be removed, provided a right migration path is prepared. Watch out for PRs, and see [the PR that deprecates `withFeatureFactory` for the initial plan for handling the removal](https://github.com/ngrx-toolkit/core/pull/167#pullrequestreview-2735443379).
 :::
