@@ -6,7 +6,7 @@ title: withResource()
 import { withResource } from '@ngrx-toolkit/core';
 ```
 
-> **⚠️ Important Note**: This extension is very likely to land in NgRx once Angular's `Resource` enters developer preview. The `withResource` extension provides early access to this functionality and will be maintained for compatibility until the official NgRx implementation is available.
+> **⚠️ Important Note**: This extension is likely to land in NgRx, pending further considerations. The `withResource` extension provides early access to this functionality and will be maintained for compatibility until the official NgRx implementation is available.
 
 `withResource()` is a feature in NgRx SignalStore that connects Angular's Resource API with the store.
 The idea: you can use a store to directly manage async data (like loading from an API), and `withResource()` helps you wire that in.
