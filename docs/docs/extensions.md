@@ -24,6 +24,7 @@ It offers extensions like:
 - [Call State](./with-call-state): Add call state management to your signal stores
 - [Storage Sync](./with-storage-sync): Synchronizes the Store with Web Storage
 - [Undo Redo](./with-undo-redo): Adds Undo/Redo functionality to your store
+- [Pagination](./with-pagination): allows for displaying a subset of items from a larger collection, based on the current page and page size
 
 To install it, run
 
