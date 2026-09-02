@@ -1,0 +1,99 @@
+<h2>withUndoRedo Playground</h2>
+
+<section class="panels">
+  <!-- State display -->
+  <mat-card class="card">
+    <mat-card-header>
+      <mat-card-title>Current State</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <h3>Counter: {{ store.counter() }}</h3>
+      <div class="counter-actions">
+        <button mat-flat-button (click)="store.increment()">+1</button>
+        <button mat-flat-button (click)="store.decrement()">-1</button>
+      </div>
+
+      <h3>Items</h3>
+      @if (store.items().length === 0) {
+        <p class="empty">No items yet. Add one below.</p>
+      }
+      <mat-list>
+        @for (item of store.items(); track item.id) {
+          <mat-list-item>
+            @if (editItemId === item.id) {
+              <input
+                matInput
+                [(ngModel)]="editItemText"
+                (keyup.enter)="saveEdit()"
+              />
+              <button mat-icon-button (click)="saveEdit()">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button (click)="cancelEdit()">
+                <mat-icon>close</mat-icon>
+              </button>
+            } @else {
+              <span>{{ item.id }}. {{ item.text }}</span>
+              <button mat-icon-button (click)="startEdit(item.id, item.text)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="removeItem(item.id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
+          </mat-list-item>
+        }
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Controls -->
+  <mat-card class="card">
+    <mat-card-header>
+      <mat-card-title>Controls</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <!-- Add item -->
+      <div class="add-item">
+        <mat-form-field>
+          <mat-label>New item text</mat-label>
+          <input matInput [(ngModel)]="newItemText" (keyup.enter)="addItem()" />
+        </mat-form-field>
+        <button mat-flat-button (click)="addItem()">Add Item</button>
+      </div>
+
+      <!-- Undo / Redo -->
+      <h3>Undo / Redo</h3>
+      <div class="actions">
+        <button mat-flat-button [disabled]="!store.canUndo()" (click)="undo()">
+          <mat-icon>undo</mat-icon> Undo
+        </button>
+        <button mat-flat-button [disabled]="!store.canRedo()" (click)="redo()">
+          <mat-icon>redo</mat-icon> Redo
+        </button>
+        <button mat-stroked-button (click)="clearStack()">Clear Stack</button>
+      </div>
+
+      <!-- Savepoints -->
+      <h3>Savepoints</h3>
+      <div class="actions">
+        <button mat-flat-button (click)="createSavepoint()">
+          <mat-icon>flag</mat-icon> Create Savepoint
+        </button>
+      </div>
+      @if (savepoints().length > 0) {
+        <p>Click a savepoint to rollback to that point in time:</p>
+        <mat-action-list>
+          @for (sp of savepoints(); track sp) {
+            <button mat-list-item (click)="rollbackTo(sp)">
+              <mat-icon matListItemIcon>restore</mat-icon>
+              {{ sp | date: 'HH:mm:ss.SSS' }}
+            </button>
+          }
+        </mat-action-list>
+      } @else {
+        <p class="empty">No savepoints created yet.</p>
+      }
+    </mat-card-content>
+  </mat-card>
+</section>
