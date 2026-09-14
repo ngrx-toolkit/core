@@ -3,7 +3,13 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
-import { Resource, resource, ResourceSnapshot, Signal } from '@angular/core';
+import {
+  Resource,
+  resource,
+  ResourceSnapshot,
+  signal,
+  Signal,
+} from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { TestBed } from '@angular/core/testing';
 import {
@@ -13,7 +19,7 @@ import {
   withProps,
   withState,
 } from '@ngrx/signals';
-import { of } from 'rxjs';
+import { delay, of } from 'rxjs';
 import { Assert, IsEqual, Satisfies } from './test-utils/types';
 import { ErrorHandling, mapToResource, withResource } from './with-resource';
 import {
@@ -24,6 +30,11 @@ import { Address, venice, vienna } from './with-resource/tests/util/fixtures';
 import { paramsForResourceTypes } from './with-resource/tests/util/params-for-resource-types';
 import { setupUnnamedResource } from './with-resource/tests/util/setup-unnamed-resource';
 import { withPreviousValue } from './with-resource/tests/util/snapshot';
+
+import {
+  extendResource,
+  withPreviousValueOnLoading,
+} from '@ngrx/signals/resource';
 
 describe('withResource', () => {
   describe('standard tests', () => {
@@ -1282,5 +1293,54 @@ describe('withResource', () => {
         })),
       );
     });
+  });
+
+  describe('supports resource extensions', () => {
+    const wait = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));
+    describe('withPreviousValueOnLoading', () => {
+      it('retains previous value of loading', async () => {
+        const stuff = signal(0);
+        const Store = signalStore(
+          { providedIn: 'root' },
+          withResource(() => ({
+            id: extendResource(
+              rxResource({
+                params: () => stuff(),
+                stream: ({ params }) => of(params).pipe(delay(2)),
+                defaultValue: 0,
+              }),
+              withPreviousValueOnLoading(),
+            ),
+          })),
+        );
+        const store = TestBed.inject(Store);
+        const value = store.idValue;
+        expect(value()).toBe(0);
+        stuff.set(1);
+        expect(store.idIsLoading()).toBe(true);
+        expect(value()).toBe(0);
+        await wait(100);
+        expect(store.idIsLoading()).toBe(false);
+        expect(value()).toBe(1);
+
+        // TODO - on extensions branch, comment this in
+        // type _T1 = Assert<IsEqual<typeof store.idValue, Signal<number>>>;
+      });
+    });
+    // describe('withValueOnLoading', () => {
+    //   it('', () => {
+    //     expect(true).toBe(false);
+    //   });
+    // });
+    // describe('withPreviousValueOnLoading', () => {
+    //   it('', () => {
+    //     expect(true).toBe(false);
+    //   });
+    // });
+    // describe('withValueOnError', () => {
+    //   it('', () => {
+    //     expect(true).toBe(false);
+    //   });
+    // });
   });
 });
