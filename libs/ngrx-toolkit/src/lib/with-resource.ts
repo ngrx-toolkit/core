@@ -136,7 +136,15 @@ type UnnamedResourceResult<
     snapshot: Signal<ResourceSnapshot<InferResourceValue<T>>>;
   } & AdditionalSignalProps<T>;
   methods: {
-    hasValue(): this is Resource<Exclude<InferResourceValue<T>, undefined>>;
+    hasValue: <
+      Original extends {
+        value: Signal<ResourceValueType<T, HasUndefinedErrorHandling>>;
+      },
+    >(
+      this: Original,
+    ) => this is {
+      value: Signal<Exclude<InferResourceValue<T>, undefined>>;
+    } & Original;
   } & ConditionalReloadMethod<T>;
 };
 
