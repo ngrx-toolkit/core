@@ -3,7 +3,13 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
-import { Resource, resource, ResourceSnapshot, Signal } from '@angular/core';
+import {
+  Resource,
+  resource,
+  ResourceSnapshot,
+  signal,
+  Signal,
+} from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { TestBed } from '@angular/core/testing';
 import {
@@ -13,12 +19,22 @@ import {
   withProps,
   withState,
 } from '@ngrx/signals';
-import { of } from 'rxjs';
+import { delay, of } from 'rxjs';
 import { Assert, IsEqual, Satisfies } from './test-utils/types';
 import { ErrorHandling, mapToResource, withResource } from './with-resource';
+import {
+  stuffExtendedResourceReadable,
+  stuffExtendedResourceWritable,
+} from './with-resource/tests/util/custom-extended-resources';
 import { Address, venice, vienna } from './with-resource/tests/util/fixtures';
 import { paramsForResourceTypes } from './with-resource/tests/util/params-for-resource-types';
 import { setupUnnamedResource } from './with-resource/tests/util/setup-unnamed-resource';
+import { withPreviousValue } from './with-resource/tests/util/snapshot';
+
+import {
+  extendResource,
+  withPreviousValueOnLoading,
+} from '@ngrx/signals/resource';
 
 describe('withResource', () => {
   describe('standard tests', () => {
@@ -263,6 +279,237 @@ describe('withResource', () => {
         });
       });
 
+      describe('extra properties checks', () => {
+        describe('extra properties go to `props` so they cannot be written to', () => {
+          it('for unnamed writables', async () => {
+            const Store = signalStore(
+              { providedIn: 'root', protectedState: false },
+              withResource(() => stuffExtendedResourceWritable(() => 'a')),
+            );
+
+            const store = TestBed.inject(Store);
+
+            await wait();
+
+            expect(store.stuff()).toBe('a stuff');
+
+            // @ts-expect-error - extra properties should not be patchable
+            patchState(store, { stuff: 'b stuff' });
+          });
+          it('for unnamed readables', async () => {
+            const Store = signalStore(
+              { providedIn: 'root', protectedState: false },
+              withResource(() => stuffExtendedResourceReadable(() => 'a')),
+            );
+
+            const store = TestBed.inject(Store);
+
+            await wait();
+
+            expect(store.stuff()).toBe('a stuff');
+
+            // @ts-expect-error - extra properties should not be patchable
+            patchState(store, { stuff: 'b stuff' });
+          });
+          it('for named readables', async () => {
+            const Store = signalStore(
+              { providedIn: 'root', protectedState: false },
+              withResource(() => ({
+                name: stuffExtendedResourceReadable(() => 'a'),
+              })),
+            );
+
+            const store = TestBed.inject(Store);
+
+            await wait();
+
+            expect(store.nameStuff()).toBe('a stuff');
+
+            // @ts-expect-error - extra properties should not be patchable
+            patchState(store, { nameStuff: 'b stuff' });
+          });
+          it('for named writables', async () => {
+            const Store = signalStore(
+              { providedIn: 'root', protectedState: false },
+              withResource(() => ({
+                name: stuffExtendedResourceWritable(() => 'a'),
+              })),
+            );
+
+            const store = TestBed.inject(Store);
+
+            await wait();
+
+            expect(store.nameStuff()).toBe('a stuff');
+
+            // @ts-expect-error - extra properties should not be patchable
+            patchState(store, { nameStuff: 'b stuff' });
+          });
+        });
+        it('can call custom unnamed writable resource and extract custom extra signal properties', async () => {
+          const Store = signalStore(
+            { providedIn: 'root', protectedState: false },
+            withResource(() => stuffExtendedResourceWritable(() => 'a')),
+          );
+          const store = TestBed.inject(Store);
+
+          await wait();
+
+          expect(store.value()).toBe('a');
+          expect(store.stuff()).toBe('a stuff');
+
+          patchState(store, { value: 'b' });
+
+          expect(store.value()).toBe('b');
+          expect(store.stuff()).toBe('b stuff');
+        });
+        it('can call custom unnamed readable resource and extract custom extra signal properties', async () => {
+          const Store = signalStore(
+            { providedIn: 'root', protectedState: false },
+            withResource(() => stuffExtendedResourceReadable(() => 'a')),
+          );
+          const store = TestBed.inject(Store);
+
+          await wait();
+
+          expect(store.value()).toBe('a');
+          expect(store.stuff()).toBe('a stuff');
+
+          // @ts-expect-error - readable resources should not have their value patchable
+          patchState(store, { value: 'b' });
+
+          expect(store.value()).toBe('a');
+          expect(store.stuff()).toBe('a stuff');
+        });
+        it('can supply custom named resources (writable and unwritable) and extract custom extra signal properties', async () => {
+          const Store = signalStore(
+            { providedIn: 'root', protectedState: false },
+            withResource(() => ({
+              idWritable: stuffExtendedResourceWritable(() => 'a'),
+              idReadable: stuffExtendedResourceReadable(() => 'a'),
+            })),
+          );
+          const store = TestBed.inject(Store);
+
+          await wait();
+
+          expect(store.idWritableValue()).toBe('a');
+          expect(store.idReadableValue()).toBe('a');
+          expect(store.idWritableStuff()).toBe('a stuff');
+          expect(store.idReadableStuff()).toBe('a stuff');
+
+          patchState(store, { idWritableValue: 'b' });
+          // @ts-expect-error - readable resources should not have their value patchable
+          patchState(store, { idReadableValue: 'b' });
+
+          expect(store.idWritableValue()).toBe('b');
+          expect(store.idReadableValue()).toBe('a');
+          expect(store.idWritableStuff()).toBe('b stuff');
+          expect(store.idReadableStuff()).toBe('a stuff');
+        });
+
+        it('can supply custom unnamed (writable and unwritable) and custom named (writable and unwritable) and extract custom extra signal properties', async () => {
+          const UnnamedWritableAndNamedComboStore = signalStore(
+            { providedIn: 'root', protectedState: false },
+            withResource(() => stuffExtendedResourceWritable(() => 'a')),
+            withResource(() => ({
+              idWritable: stuffExtendedResourceWritable(() => 'a'),
+              idReadable: stuffExtendedResourceReadable(() => 'a'),
+            })),
+          );
+          const unnamedWritableAndNamedComboStore = TestBed.inject(
+            UnnamedWritableAndNamedComboStore,
+          );
+
+          await wait();
+
+          expect(unnamedWritableAndNamedComboStore.value()).toBe('a');
+          expect(unnamedWritableAndNamedComboStore.stuff()).toBe('a stuff');
+          expect(unnamedWritableAndNamedComboStore.idWritableValue()).toBe('a');
+          expect(unnamedWritableAndNamedComboStore.idReadableValue()).toBe('a');
+          expect(unnamedWritableAndNamedComboStore.idWritableStuff()).toBe(
+            'a stuff',
+          );
+          expect(unnamedWritableAndNamedComboStore.idReadableStuff()).toBe(
+            'a stuff',
+          );
+
+          patchState(unnamedWritableAndNamedComboStore, {
+            idWritableValue: 'b',
+          });
+          patchState(unnamedWritableAndNamedComboStore, { value: 'b' });
+          patchState(unnamedWritableAndNamedComboStore, {
+            // @ts-expect-error - readable resources should not have their value patchable
+            idReadableValue: 'b',
+          });
+
+          expect(unnamedWritableAndNamedComboStore.value()).toBe('b');
+          expect(unnamedWritableAndNamedComboStore.stuff()).toBe('b stuff');
+          expect(unnamedWritableAndNamedComboStore.idWritableValue()).toBe('b');
+          expect(unnamedWritableAndNamedComboStore.idReadableValue()).toBe('a');
+          expect(unnamedWritableAndNamedComboStore.idWritableStuff()).toBe(
+            'b stuff',
+          );
+          expect(unnamedWritableAndNamedComboStore.idReadableStuff()).toBe(
+            'a stuff',
+          );
+
+          const UnnamedUnwritableAndNamedComboStore = signalStore(
+            { providedIn: 'root', protectedState: false },
+            withResource(() => stuffExtendedResourceReadable(() => 'a')),
+            withResource(() => ({
+              idWritable: stuffExtendedResourceWritable(() => 'a'),
+              idReadable: stuffExtendedResourceReadable(() => 'a'),
+            })),
+          );
+          const unnamedUnwritableAndNamedComboStore = TestBed.inject(
+            UnnamedUnwritableAndNamedComboStore,
+          );
+
+          await wait();
+
+          expect(unnamedUnwritableAndNamedComboStore.value()).toBe('a');
+          expect(unnamedUnwritableAndNamedComboStore.stuff()).toBe('a stuff');
+          expect(unnamedUnwritableAndNamedComboStore.idWritableValue()).toBe(
+            'a',
+          );
+          expect(unnamedUnwritableAndNamedComboStore.idReadableValue()).toBe(
+            'a',
+          );
+          expect(unnamedUnwritableAndNamedComboStore.idWritableStuff()).toBe(
+            'a stuff',
+          );
+          expect(unnamedUnwritableAndNamedComboStore.idReadableStuff()).toBe(
+            'a stuff',
+          );
+
+          patchState(unnamedUnwritableAndNamedComboStore, {
+            idWritableValue: 'b',
+          });
+          // @ts-expect-error - readable resources should not have their value patchable
+          patchState(unnamedUnwritableAndNamedComboStore, { value: 'b' });
+          patchState(unnamedUnwritableAndNamedComboStore, {
+            // @ts-expect-error - readable resources should not have their value patchable
+            idReadableValue: 'b',
+          });
+
+          expect(unnamedUnwritableAndNamedComboStore.value()).toBe('a');
+          expect(unnamedUnwritableAndNamedComboStore.stuff()).toBe('a stuff');
+          expect(unnamedUnwritableAndNamedComboStore.idWritableValue()).toBe(
+            'b',
+          );
+          expect(unnamedUnwritableAndNamedComboStore.idReadableValue()).toBe(
+            'a',
+          );
+          expect(unnamedUnwritableAndNamedComboStore.idWritableStuff()).toBe(
+            'b stuff',
+          );
+          expect(unnamedUnwritableAndNamedComboStore.idReadableStuff()).toBe(
+            'a stuff',
+          );
+        });
+      });
+
       describe('override protection', () => {
         const warningSpy = jest.spyOn(console, 'warn');
 
@@ -312,6 +559,33 @@ describe('withResource', () => {
             'userValue',
           );
         });
+
+        //TODO wait for https://github.com/ngrx/platform/pull/4932 and then add 'value' to the list
+        it.each([
+          'status',
+          'error',
+          'isLoading',
+          '_reload',
+          'hasValue',
+          'stuff',
+        ])(
+          `warns if %s is not a member of the store with a custom extended resource`,
+          (memberName) => {
+            const Store = signalStore(
+              { providedIn: 'root' },
+              withProps(() => ({ [memberName]: true })),
+              withResource(() => stuffExtendedResourceWritable(() => 'a')),
+            );
+
+            TestBed.inject(Store);
+
+            expect(warningSpy).toHaveBeenCalledWith(
+              '@ngrx/signals: SignalStore members cannot be overridden.',
+              'Trying to override:',
+              memberName,
+            );
+          },
+        );
       });
 
       it('works also with list/detail use case', async () => {
@@ -319,12 +593,14 @@ describe('withResource', () => {
           { providedIn: 'root', protectedState: false },
           withState({ id: undefined as number | undefined }),
           withResource(({ id }) => ({
-            list: httpResource<{ id: number; name: string }[]>(
-              () => '/address',
+            list: httpResource<
               {
-                defaultValue: [],
-              },
-            ),
+                id: number;
+                name: string;
+              }[]
+            >(() => '/address', {
+              defaultValue: [],
+            }),
             detail: httpResource<Address>(() =>
               id() ? `/address/${id()}` : undefined,
             ),
@@ -798,6 +1074,77 @@ describe('withResource', () => {
         IsEqual<typeof _store.digitValue, Signal<number | undefined>>
       >;
     });
+    it('only exposes reload methods for reloadable resources', () => {
+      const Store = signalStore(
+        { providedIn: 'root' },
+        withResource(() => ({
+          digit: resource({
+            loader: () => Promise.resolve(-1),
+            defaultValue: 0,
+          }),
+          digitSnapshotted: withPreviousValue(
+            resource({
+              loader: () => Promise.resolve(-1),
+              defaultValue: 0,
+            }),
+          ),
+        })),
+        withResource(() =>
+          resource({
+            loader: () => Promise.resolve(-1),
+            defaultValue: 0,
+          }),
+        ),
+        withMethods((store) => ({
+          namedReload: () => store._digitReload(),
+          unnamedReload: () => store._reload(),
+          // @ts-expect-error - a snapshot should not have a reload
+          invalidReload: () => store._digitSnapshottedReload(),
+        })),
+      );
+
+      const _store = TestBed.inject(Store);
+
+      type _T1 = Assert<IsEqual<typeof _store.namedReload, () => boolean>>;
+      type _T2 = Assert<IsEqual<typeof _store.unnamedReload, () => boolean>>;
+    });
+
+    describe('patchState restrictions do not allow patching', () => {
+      it('an unnamed non-reloadable resource value', () => {
+        signalStore(
+          withResource(() =>
+            withPreviousValue(
+              resource({
+                loader: () => Promise.resolve(1),
+                defaultValue: 0,
+              }),
+            ),
+          ),
+          withMethods((store) => ({
+            // @ts-expect-error - non-reloadable Resource values are not state
+            setValue: (value: number) => patchState(store, { value }),
+          })),
+        );
+      });
+
+      it('a named non-reloadable resource value', () => {
+        signalStore(
+          withResource(() => ({
+            digitSnapshotted: withPreviousValue(
+              resource({
+                loader: () => Promise.resolve(-1),
+                defaultValue: 0,
+              }),
+            ),
+          })),
+          withMethods((store) => ({
+            setNamedValue: (value: number) =>
+              // @ts-expect-error digitSnapshotted is a `Resource` value, but not state, so it should not be patchable
+              patchState(store, { digitSnapshottedValue: value }),
+          })),
+        );
+      });
+    });
 
     describe('mapToResource', () => {
       it('satisfies the Resource interface without default value', () => {
@@ -946,5 +1293,54 @@ describe('withResource', () => {
         })),
       );
     });
+  });
+
+  describe('supports resource extensions', () => {
+    const wait = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));
+    describe('withPreviousValueOnLoading', () => {
+      it('retains previous value of loading', async () => {
+        const stuff = signal(0);
+        const Store = signalStore(
+          { providedIn: 'root' },
+          withResource(() => ({
+            id: extendResource(
+              rxResource({
+                params: () => stuff(),
+                stream: ({ params }) => of(params).pipe(delay(2)),
+                defaultValue: 0,
+              }),
+              withPreviousValueOnLoading(),
+            ),
+          })),
+        );
+        const store = TestBed.inject(Store);
+        const value = store.idValue;
+        expect(value()).toBe(0);
+        stuff.set(1);
+        expect(store.idIsLoading()).toBe(true);
+        expect(value()).toBe(0);
+        await wait(100);
+        expect(store.idIsLoading()).toBe(false);
+        expect(value()).toBe(1);
+
+        // TODO - on extensions branch, comment this in
+        // type _T1 = Assert<IsEqual<typeof store.idValue, Signal<number>>>;
+      });
+    });
+    // describe('withValueOnLoading', () => {
+    //   it('', () => {
+    //     expect(true).toBe(false);
+    //   });
+    // });
+    // describe('withPreviousValueOnLoading', () => {
+    //   it('', () => {
+    //     expect(true).toBe(false);
+    //   });
+    // });
+    // describe('withValueOnError', () => {
+    //   it('', () => {
+    //     expect(true).toBe(false);
+    //   });
+    // });
   });
 });

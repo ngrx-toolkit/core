@@ -9,7 +9,7 @@ import { setupNamedResource } from './setup-named-resource';
 export function setupMappedResource(
   errorHandling: ErrorHandling,
 ): ResourceTestAdapter {
-  const { addressResolver, setId, setValue, reload, store } =
+  const { addressResolver, setId, setValue, store } =
     setupNamedResource(errorHandling);
 
   const resource = mapToResource(
@@ -28,6 +28,5 @@ export function setupMappedResource(
       isLoading: resource.isLoading(),
       hasValue: resource.hasValue(),
     }),
-    reload,
   };
 }
