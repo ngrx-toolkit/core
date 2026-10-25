@@ -397,15 +397,74 @@ describe('withResource', () => {
           expect(store.idReadableValue()).toBe('a');
           expect(store.idWritableStuff()).toBe('a stuff');
           expect(store.idReadableStuff()).toBe('a stuff');
+          expect(store.idWritable.value()).toBe('a');
+          expect(store.idWritableStuff()).toBe(store.idWritable.stuff());
+
+          type _WritableResourceValue = Assert<
+            IsEqual<typeof store.idWritable.value, Signal<string | undefined>>
+          >;
+          type _ReadableResource = Assert<
+            IsEqual<
+              typeof store.idReadable,
+              ReturnType<typeof stuffExtendedResourceReadable>
+            >
+          >;
+          type _Reload = Assert<
+            IsEqual<typeof store.idWritable.reload, () => boolean>
+          >;
+          type _NoSet = Assert<
+            IsEqual<
+              'set' extends keyof typeof store.idWritable ? true : false,
+              false
+            >
+          >;
+          type _NoUpdate = Assert<
+            IsEqual<
+              'update' extends keyof typeof store.idWritable ? true : false,
+              false
+            >
+          >;
+          type _NoWritableValue = Assert<
+            IsEqual<
+              'set' extends keyof typeof store.idWritable.value ? true : false,
+              false
+            >
+          >;
 
           patchState(store, { idWritableValue: 'b' });
           // @ts-expect-error - readable resources should not have their value patchable
           patchState(store, { idReadableValue: 'b' });
 
           expect(store.idWritableValue()).toBe('b');
+          expect(store.idWritable.value()).toBe('b');
           expect(store.idReadableValue()).toBe('a');
           expect(store.idWritableStuff()).toBe('b stuff');
           expect(store.idReadableStuff()).toBe('a stuff');
+        });
+
+        it('preserves reload on custom named resources', () => {
+          const Store = signalStore(
+            { providedIn: 'root' },
+            withResource(() => ({
+              custom: {
+                ...stuffExtendedResourceReadable(() => 'a'),
+                reload: (): boolean => true,
+              },
+            })),
+          );
+          const store = TestBed.inject(Store);
+
+          expect(store.custom.reload()).toBe(true);
+
+          type _CustomReload = Assert<
+            IsEqual<typeof store.custom.reload, () => boolean>
+          >;
+          type _CustomStuff = Assert<
+            IsEqual<
+              typeof store.custom.stuff,
+              ReturnType<typeof stuffExtendedResourceReadable>['stuff']
+            >
+          >;
         });
 
         it('can supply custom unnamed (writable and unwritable) and custom named (writable and unwritable) and extract custom extra signal properties', async () => {
@@ -1064,6 +1123,7 @@ describe('withResource', () => {
       );
 
       const _store = TestBed.inject(Store);
+      const _digitResource: Resource<number> = _store.digit;
 
       type _T1 = Assert<IsEqual<typeof _store.idValue, Signal<number>>>;
       type _T2 = Assert<
@@ -1073,6 +1133,8 @@ describe('withResource', () => {
       type _T4 = Assert<
         IsEqual<typeof _store.digitValue, Signal<number | undefined>>
       >;
+      type _T5 = Assert<IsEqual<typeof _store.digit.value, Signal<number>>>;
+      type _T6 = Assert<IsEqual<typeof _store.digit.reload, () => boolean>>;
     });
     it('only exposes reload methods for reloadable resources', () => {
       const Store = signalStore(

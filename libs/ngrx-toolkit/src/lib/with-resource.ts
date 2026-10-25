@@ -2,6 +2,7 @@
 
 import { HttpResourceRef } from '@angular/common/http';
 import {
+  computed,
   isSignal,
   Resource,
   ResourceRef,
@@ -98,6 +99,11 @@ type AdditionalSignalProps<T extends Resource<unknown>> = {
 type InferResourceValue<T extends Resource<unknown>> =
   T['value'] extends Signal<infer S> ? S : never;
 
+type NamedResourceProp<T extends Resource<unknown>> =
+  T extends ResourceRef<infer Value>
+    ? Omit<T, 'set' | 'update' | 'value'> & Resource<Value>
+    : T;
+
 type ConditionalReloadMethod<T extends Resource<unknown>> =
   T extends ReloadableResource<unknown>
     ? { _reload(): boolean }
@@ -189,6 +195,8 @@ export type NamedResourceResult<
       : never;
   } & NonPatchableResourceStateMarker;
   props: {
+    [Prop in keyof T]: NamedResourceProp<T[Prop]>;
+  } & {
     [Prop in keyof T as T[Prop] extends ReloadableResource<unknown>
       ? never
       : `${Prop & string}Value`]: Signal<
@@ -235,6 +243,9 @@ export type NamedResourceResult<
   };
 };
 
+// TODO - Get approval of this
+// My proposal is that for the Toolkit, we encourage native + `extendResource` error handling.
+// And for NgRx, drop error handling and leave it to the user to handle it with `extendResource`
 export type ErrorHandling = 'native' | 'undefined value' | 'previous value';
 
 export type ResourceOptions = {
@@ -321,6 +332,9 @@ export function withResource<
  *
  * Reloadable resources (`ResourceRef`/`HttpResourceRef`) place their values
  * in state using `<name>Value` keys and support updates via `patchState`.
+ * Each named resource is also exposed directly on the store. Writable
+ * resources are exposed without `set` and `update`; other custom resource
+ * members, including `reload`, are preserved.
  *
  * Plain `Resource` values are exposed as read-only signals with `<name>Value`
  * but are not stored in state.
@@ -464,11 +478,26 @@ function createNamedResource<Dictionary extends ResourceDictionary>(
   const keys = Object.keys(dictionary);
 
   const state: Record<string, WritableSignal<unknown>> = {};
-  const props: Record<string, Signal<unknown>> = {};
+  const props: Record<string, unknown> = {};
   const methods: Record<string, () => boolean> = {};
 
   for (const resourceName of keys) {
     const res = dictionary[resourceName];
+
+    if (isResourceRef(res)) {
+      const value = valueSignalForErrorHandling(
+        res,
+        errorHandling,
+      ) as WritableSignal<unknown>;
+      const { set: _set, update: _update, ...resourceProps } = res;
+      props[resourceName] = {
+        ...resourceProps,
+        value: computed(() => value()),
+      } satisfies NamedResourceProp<typeof res>;
+      state[`${resourceName}Value`] = value;
+    } else {
+      props[resourceName] = res;
+    }
 
     props[`${resourceName}Status`] = res.status;
     props[`${resourceName}Error`] = res.error;
@@ -480,10 +509,6 @@ function createNamedResource<Dictionary extends ResourceDictionary>(
       : () => res.hasValue();
 
     if (isResourceRef(res)) {
-      state[`${resourceName}Value`] = valueSignalForErrorHandling(
-        res,
-        errorHandling,
-      ) as WritableSignal<unknown>;
       methods[`_${resourceName}Reload`] = () => res.reload();
     } else {
       props[`${resourceName}Value`] = valueSignalForErrorHandling(
@@ -562,7 +587,7 @@ function isResourceCoreKey(key: string): key is ResourceCoreKeys {
 }
 
 function assignPrefixedProps(
-  target: Record<string, Signal<unknown>>,
+  target: Record<string, unknown>,
   resourceName: string,
   source: Record<string, Signal<unknown>>,
 ): void {
@@ -665,6 +690,9 @@ export function mapToResource<
   } as MappedResource<Store, Name>;
 }
 
+// TODO - Get approval of this
+// My proposal is that for the Toolkit, we encourage native + `extendResource` error handling.
+// And for NgRx, drop error handling and leave it to the user to handle it with `extendResource`
 /**
  * Strategies to work around the error throwing behavior of the Resource API.
  *

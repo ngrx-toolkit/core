@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run ngrx-toolkit build",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["nx", "build", "ngrx-toolkit", "--skip-nx-cache"],
+      "isBackground": false,
+      "problemMatcher": []
+    },
+    {
+      "label": "Run ngrx-toolkit tests",
+      "type": "shell",
+      "command": "pnpm",
+      "args": [
+        "nx",
+        "test",
+        "ngrx-toolkit",
+        "--runInBand",
+        "--runTestsByPath",
+        "libs/ngrx-toolkit/src/lib/with-resource.spec.ts"
+      ],
+      "isBackground": false,
+      "problemMatcher": []
+    }
+  ]
+}
