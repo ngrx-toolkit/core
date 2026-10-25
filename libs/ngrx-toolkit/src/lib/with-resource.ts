@@ -243,6 +243,9 @@ export type NamedResourceResult<
   };
 };
 
+// TODO - Get approval of this
+// My proposal is that for the Toolkit, we encourage native + `extendResource` error handling.
+// And for NgRx, drop error handling and leave it to the user to handle it with `extendResource`
 export type ErrorHandling = 'native' | 'undefined value' | 'previous value';
 
 export type ResourceOptions = {
@@ -687,6 +690,9 @@ export function mapToResource<
   } as MappedResource<Store, Name>;
 }
 
+// TODO - Get approval of this
+// My proposal is that for the Toolkit, we encourage native + `extendResource` error handling.
+// And for NgRx, drop error handling and leave it to the user to handle it with `extendResource`
 /**
  * Strategies to work around the error throwing behavior of the Resource API.
  *
