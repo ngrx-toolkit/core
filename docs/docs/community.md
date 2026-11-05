@@ -34,6 +34,7 @@ Here are some links with respect to two types of community involvement:
 - Angular Space livestreams
   - [Rainer's appearance](https://youtu.be/UUhZm52tigQ?t=2930), taking general Toolkit questions from Angular Space host Armen Vardanyan
   - [Michael Small's appearance](https://youtu.be/X59d8GJnNhE?t=603), speaking about Mutations when they were being RFC'd, and `withResource`.
+  - [November 2026 (~v22) Angular Space stream with Michael Small](https://www.youtube.com/watch?v=yDvhEGxoohA). A followup to some topics from Michael and Rainer's previous appearance, why the NgRx Toolkit was made, and an overview of popular features. [Michael's StackBlitz project showcasing popular utilities](https://stackblitz.com/edit/xfn8gxrf-umnbhxr9?file=src%2Fmain.ts) like `withResource` and mutations, `withDevtools` and `withStorageSync`, and `withImmutableState`. Lifted directly from the Toolkit's own demo app that you can see full examples of all utilities in if you pull down the Toolkit's source.
 - [Jason Warner (@xocomil) speaks about `withResource/withMutations` on a livestream](https://www.youtube.com/watch?v=kitcmXNj5K0&t=6344s)
   - Michael Small is an active chat member on Jason's streams, so Jason has talked about the Toolkit a lot on stream, and probably will in the future if he keeps humoring Michael.
 
