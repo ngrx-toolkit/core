@@ -1,6 +1,6 @@
 import { inject, resource } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { patchState, signalStore, withState } from '@ngrx/signals';
 import { ErrorHandling, withResource } from '../../../with-resource';
 import { Address, AddressResolver, venice } from './fixtures';
 import { ResourceTestAdapter } from './resource-test-adapter';
@@ -27,7 +27,6 @@ export function setupNamedResource(
       },
       { errorHandling },
     ),
-    withMethods((store) => ({ reload: () => store._addressReload() })),
   );
 
   TestBed.configureTestingModule({
@@ -54,6 +53,5 @@ export function setupNamedResource(
       isLoading: store.addressIsLoading(),
       hasValue: store.addressHasValue(),
     }),
-    reload: () => store.reload(),
   };
 }

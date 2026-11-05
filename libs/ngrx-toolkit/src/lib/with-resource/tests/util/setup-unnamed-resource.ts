@@ -3,11 +3,11 @@ import { TestBed } from '@angular/core/testing';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { ErrorHandling, withResource } from '../../../with-resource';
 import { Address, AddressResolver, venice } from './fixtures';
-import { ResourceTestAdapter } from './resource-test-adapter';
+import { ReloadableResourceTestAdapter } from './resource-test-adapter';
 
 export function setupUnnamedResource(
   errorHandling?: ErrorHandling,
-): ResourceTestAdapter {
+): ReloadableResourceTestAdapter {
   const addressResolver = {
     resolve: jest.fn(() => Promise.resolve(venice)),
   };

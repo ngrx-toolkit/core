@@ -12,5 +12,8 @@ export type ResourceTestAdapter = {
     isLoading: boolean;
     hasValue: boolean;
   };
+};
+
+export type ReloadableResourceTestAdapter = ResourceTestAdapter & {
   reload: () => void;
 };
