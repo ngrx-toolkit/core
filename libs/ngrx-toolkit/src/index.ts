@@ -6,11 +6,12 @@ export {
   provideDevtoolsConfig,
 } from './lib/devtools/provide-devtools-config';
 export { renameDevtoolsName } from './lib/devtools/rename-devtools-name';
+export { trackedEvent } from './lib/devtools/tracked-event';
+export { trackedEventGroup } from './lib/devtools/tracked-event-group';
 export { patchState, updateState } from './lib/devtools/update-state';
 export { withDevToolsStub } from './lib/devtools/with-dev-tools-stub';
 export { DevtoolsFeature, withDevtools } from './lib/devtools/with-devtools';
 export { withTrackedReducer } from './lib/devtools/with-tracked-reducer';
-
 export {
   createEffects,
   createReducer,
