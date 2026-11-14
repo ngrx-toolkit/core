@@ -91,4 +91,11 @@ export const lazyRoutes: Route[] = [
         (m) => m.WithResourceComponent,
       ),
   },
+  {
+    path: 'with-undo-redo',
+    loadComponent: () =>
+      import('./with-undo-redo/with-undo-redo.component').then(
+        (m) => m.WithUndoRedoComponent,
+      ),
+  },
 ];
