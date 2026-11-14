@@ -12,6 +12,7 @@ import {
 import {
   EntityId,
   NamedEntityState,
+  SelectEntityId,
   addEntity,
   removeEntity,
   setAllEntities,
@@ -28,7 +29,7 @@ import {
 } from './with-call-state';
 
 export type Filter = Record<string, unknown>;
-export type Entity = { id: EntityId };
+export type Entity = Record<string, unknown>;
 
 export interface DataService<E extends Entity, F extends Filter> {
   load(filter: F): Promise<E[]>;
@@ -121,6 +122,16 @@ export function getDataServiceKeys(options: { collection?: string }) {
   };
 }
 
+const selectEntityId = <E extends Entity>(
+  selectId?: SelectEntityId<E>
+): SelectEntityId<E> => {
+  if (typeof selectId === 'function') {
+    return selectId;
+  }
+
+  return (entity: E) => entity['id'] as EntityId;
+};
+
 export type NamedDataServiceState<
   E extends Entity,
   F extends Filter,
@@ -202,6 +213,7 @@ export function withDataService<
   dataServiceType: ProviderToken<DataService<E, F>>;
   filter: F;
   collection: Collection;
+  selectId?: SelectEntityId<E>;
 }): SignalStoreFeature<
   EmptyFeatureResult & {
     state: NamedCallStateSlice<Collection> & NamedEntityState<E, Collection>;
@@ -215,6 +227,7 @@ export function withDataService<
 export function withDataService<E extends Entity, F extends Filter>(options: {
   dataServiceType: ProviderToken<DataService<E, F>>;
   filter: F;
+  selectId?: SelectEntityId<E>;
 }): SignalStoreFeature<
   EmptyFeatureResult & { state: { callState: CallState } & EntityState<E> },
   {
@@ -232,6 +245,7 @@ export function withDataService<
   dataServiceType: ProviderToken<DataService<E, F>>;
   filter: F;
   collection?: Collection;
+  selectId?: SelectEntityId<E>;
 }): /* eslint-disable @typescript-eslint/no-explicit-any */
 SignalStoreFeature<any, any> {
   const { dataServiceType, filter, collection: prefix } = options;
@@ -243,7 +257,6 @@ SignalStoreFeature<any, any> {
     selectedIdsKey,
     updateFilterKey,
     updateSelectedKey,
-
     currentKey,
     createKey,
     updateKey,
@@ -252,6 +265,8 @@ SignalStoreFeature<any, any> {
     loadByIdKey,
     setCurrentKey,
   } = getDataServiceKeys(options);
+
+  const selectId = selectEntityId(options.selectId);
 
   const { callStateKey } = getCallStateKeys({ collection: prefix });
 
@@ -269,7 +284,7 @@ SignalStoreFeature<any, any> {
 
       return {
         [selectedEntitiesKey]: computed(() =>
-          entities().filter((e) => selectedIds()[e.id]),
+          entities().filter((e) => selectedIds()[selectId(e)])
         ),
       };
     }),
@@ -298,8 +313,8 @@ SignalStoreFeature<any, any> {
               patchState(
                 store,
                 prefix
-                  ? setAllEntities(result, { collection: prefix })
-                  : setAllEntities(result),
+                  ? setAllEntities(result, { collection: prefix, selectId })
+                  : setAllEntities(result, { selectId })
               );
               (() =>
                 store[callStateKey] && patchState(store, setLoaded(prefix)))();
@@ -340,8 +355,8 @@ SignalStoreFeature<any, any> {
               patchState(
                 store,
                 prefix
-                  ? addEntity(created, { collection: prefix })
-                  : addEntity(created),
+                  ? addEntity(created, { collection: prefix, selectId })
+                  : addEntity(created, { selectId })
               );
               (() =>
                 store[callStateKey] && patchState(store, setLoaded(prefix)))();
@@ -362,12 +377,12 @@ SignalStoreFeature<any, any> {
               patchState(store, { [currentKey]: updated });
 
               const updateArg = {
-                id: updated.id,
+                id: selectId(entity),
                 changes: updated,
               };
 
               const updater = (collection: string) =>
-                updateEntity(updateArg, { collection });
+                updateEntity(updateArg, { collection, selectId });
 
               patchState(
                 store,
@@ -391,8 +406,8 @@ SignalStoreFeature<any, any> {
               patchState(
                 store,
                 prefix
-                  ? setAllEntities(result, { collection: prefix })
-                  : setAllEntities(result),
+                  ? setAllEntities(result, { collection: prefix, selectId })
+                  : setAllEntities(result, { selectId })
               );
               (() =>
                 store[callStateKey] && patchState(store, setLoaded(prefix)))();
@@ -409,13 +424,15 @@ SignalStoreFeature<any, any> {
               store[callStateKey] && patchState(store, setLoading(prefix)))();
 
             try {
+              const id = selectId(entity);
+
               await dataService.delete(entity);
               patchState(store, { [currentKey]: undefined });
               patchState(
                 store,
                 prefix
-                  ? removeEntity(entity.id, { collection: prefix })
-                  : removeEntity(entity.id),
+                  ? removeEntity(id, { collection: prefix })
+                  : removeEntity(id)
               );
               (() =>
                 store[callStateKey] && patchState(store, setLoaded(prefix)))();
